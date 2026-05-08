@@ -5,7 +5,8 @@
       "Bash(Select-String -Pattern \"shpca_|shpat_|ghp_|sk-ant-\" -CaseSensitive)",
       "Bash(git commit -m ' *)",
       "Bash(git pull *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(node test/proxy-test.js)"
     ]
   }
 }
