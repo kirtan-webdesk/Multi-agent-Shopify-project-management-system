@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(Select-String -Pattern \"shpca_|shpat_|ghp_|sk-ant-\" -CaseSensitive)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
