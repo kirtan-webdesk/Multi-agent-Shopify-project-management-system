@@ -14,9 +14,21 @@ module.exports = async function handler(req, res) {
 
   const githubPath = req.url.replace(/^\/api\/github/, '') || '/';
 
+  // Defensive body parsing — works whether or not Vercel pre-parsed req.body.
   let bodyData = '';
-  if (!['GET', 'DELETE'].includes(req.method) && req.body) {
-    bodyData = JSON.stringify(req.body);
+  if (!['GET', 'DELETE'].includes(req.method)) {
+    if (req.body && typeof req.body === 'object' && Object.keys(req.body).length) {
+      bodyData = JSON.stringify(req.body);
+    } else if (typeof req.body === 'string' && req.body.length) {
+      bodyData = req.body;
+    } else {
+      bodyData = await new Promise((resolve) => {
+        let raw = '';
+        req.on('data', (chunk) => { raw += chunk; });
+        req.on('end', () => resolve(raw));
+        req.on('error', () => resolve(''));
+      });
+    }
   }
 
   const options = {

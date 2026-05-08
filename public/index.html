@@ -1020,7 +1020,10 @@ async function runPipeline(){
       s.actions.push({icon:'📋',text:'Metafield: custom.featured_product_ingredient (PRODUCT)','st':'CREATED','sc':'ast-ok'});
       await shopifyMetafield('agency','project_name','single_line_text_field','SHOP','Agency project identifier');
       s.actions.push({icon:'📋',text:'Metafield: agency.project_name (SHOP)','st':'CREATED','sc':'ast-ok'});
-      var wh=['customers/data_request','customers/redact','shop/redact'];
+      // GDPR webhooks (customers/data_request, customers/redact, shop/redact) cannot be
+      // subscribed via the REST /webhooks.json endpoint on a Custom App — they're declared
+      // in app config / Partner Dashboard for public apps only. Use real subscribable topics.
+      var wh=['orders/create','orders/paid','products/update','customers/create','app/uninstalled'];
       for(var w of wh){ await shopifyWebhook(w); s.actions.push({icon:'🔔',text:'Webhook: '+w,'st':'REGISTERED','sc':'ast-ok'}); }
       var branch='feature/S1.2-backend';
       await ghCreateBranch(branch,CFG.develop);

@@ -25,9 +25,23 @@ module.exports = async function handler(req, res) {
   const cleanStore  = store.replace(/https?:\/\//, '').replace(/\/$/, '');
   const fullPath    = `/admin/api/2024-01${shopifyPath}`;
 
+  // Body parsing — be defensive. Vercel usually parses JSON into req.body, but
+  // `vercel dev` and certain runtimes don't. Fall back to reading the raw stream.
+  // Without this, GraphQL POSTs go upstream as `{}` and Shopify returns 406.
   let bodyData = '';
   if (!['GET', 'DELETE'].includes(req.method)) {
-    bodyData = JSON.stringify(req.body || {});
+    if (req.body && typeof req.body === 'object' && Object.keys(req.body).length) {
+      bodyData = JSON.stringify(req.body);
+    } else if (typeof req.body === 'string' && req.body.length) {
+      bodyData = req.body;
+    } else {
+      bodyData = await new Promise((resolve) => {
+        let raw = '';
+        req.on('data', (chunk) => { raw += chunk; });
+        req.on('end', () => resolve(raw));
+        req.on('error', () => resolve(''));
+      });
+    }
   }
 
   const options = {
@@ -37,6 +51,7 @@ module.exports = async function handler(req, res) {
     headers: {
       'X-Shopify-Access-Token': token,
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     }
   };
 
