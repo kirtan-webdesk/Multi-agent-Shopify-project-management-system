@@ -808,13 +808,18 @@ async function goStep2(){
   if(sw.length<30){ showErr('err1','Scope of work is too short — please be more descriptive'); return; }
   if(!store){ showErr('err1','Enter your Shopify store URL'); return; }
   if(!repo){ showErr('err1','Enter your GitHub repository URL'); return; }
-  // Parse GitHub repo URL — handle all formats:
-  // https://github.com/owner/repo
-  // https://github.com/owner/repo.git
-  // owner/repo
-  var repoClean=repo.replace(/https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,'');
-  var gh=repoClean.split('/').filter(Boolean);
-  if(gh.length<2){ showErr('err1','GitHub repo URL format must be: https://github.com/your-username/your-repo'); return; }
+  // Parse GitHub repo URL — handle all formats, including doubled URLs like
+  //   https://github.com/owner/https://github.com/owner/repo.git
+  // by globally stripping every github.com/ prefix and using the LAST two path segments.
+  var repoClean=repo
+    .replace(/https?:\/\/github\.com\//gi,'')
+    .replace(/git@github\.com:/gi,'')
+    .replace(/\.git$/i,'')
+    .replace(/^\/+|\/+$/g,'');
+  var ghAll=repoClean.split('/').filter(Boolean);
+  if(ghAll.length<2){ showErr('err1','GitHub repo URL format must be: https://github.com/your-username/your-repo'); return; }
+  // Take the LAST two segments — owner/repo — so any leading garbage is ignored.
+  var gh=[ghAll[ghAll.length-2],ghAll[ghAll.length-1]];
   CFG.ak='via-vercel'; CFG.st='via-vercel';
   CFG.store=store.replace(/https?:\/\//,'').replace(/\/$/,'');
   CFG.ght='via-vercel'; CFG.owner=gh[0]; CFG.repo=gh[1];
