@@ -517,9 +517,33 @@ async function shopifySetup(){
 }
 
 async function shopifyMetafield(ns,key,type,owner,desc){
-  var r=await shopify('POST','/metafield_definitions.json',{metafield_definition:{name:key,namespace:ns,key:key,type:type,owner_type:owner,description:desc||''}});
-  if(r&&r.metafield_definition){ addShopifyAct('📋','Metafield created',ns+'.'+key+' ('+owner+')','CREATED','ast-ok'); return r.metafield_definition; }
-  addShopifyAct('📋','Metafield skipped — may already exist',ns+'.'+key,'SKIP','ast-warn');
+  // Metafield definitions are GraphQL-only — REST /metafield_definitions.json returns 406.
+  // Call via the existing /api/shopify proxy hitting /admin/api/2024-01/graphql.json.
+  var query='mutation CreateDef($d: MetafieldDefinitionInput!) { metafieldDefinitionCreate(definition: $d) { createdDefinition { id name namespace key } userErrors { field message code } } }';
+  var variables={d:{name:key,namespace:ns,key:key,type:type,ownerType:owner,description:desc||''}};
+  var r=await shopify('POST','/graphql.json',{query:query,variables:variables});
+  if(r&&r.data&&r.data.metafieldDefinitionCreate){
+    var d=r.data.metafieldDefinitionCreate;
+    if(d.createdDefinition){
+      addShopifyAct('📋','Metafield definition created',ns+'.'+key+' ('+owner+')','CREATED','ast-ok');
+      return d.createdDefinition;
+    }
+    if(d.userErrors&&d.userErrors.length){
+      var msg=d.userErrors.map(function(e){return e.message;}).join(', ');
+      var code=d.userErrors[0].code||'';
+      if(/taken|already|exists/i.test(msg)||code==='TAKEN'){
+        addShopifyAct('📋','Metafield definition exists — skipped',ns+'.'+key,'SKIP','ast-warn');
+      } else {
+        addShopifyAct('📋','Metafield definition error',ns+'.'+key+' — '+msg,'ERROR','ast-err');
+      }
+      return null;
+    }
+  }
+  if(r&&r.errors){
+    addShopifyAct('📋','Metafield GraphQL error',ns+'.'+key+' — '+(r.errors[0]&&r.errors[0].message||'unknown'),'ERROR','ast-err');
+  } else {
+    addShopifyAct('📋','Metafield skipped — no response',ns+'.'+key,'SKIP','ast-warn');
+  }
   return null;
 }
 
