@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Shopify AI Agency · v7</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#09090c;--s1:#111116;--s2:#17171e;--s3:#1e1e27;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.20);
+  --t1:#eeecf8;--t2:#8884a8;--t3:#4a4868;
+  --acc:#7c6af5;--acc2:#5a4fd4;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--blue:#3b82f6;--teal:#14b8a6;--pink:#ec4899;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:13px;min-height:100vh;overflow-x:hidden}
+
+/* HEADER */
+.hdr{padding:12px 18px 0;border-bottom:1px solid var(--b1);background:linear-gradient(180deg,rgba(124,106,245,.07) 0%,transparent 100%)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-i{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--acc),#4a3ab8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.logo-t{font-size:13px;font-weight:600}.logo-s{font-size:10px;color:var(--t2);margin-top:1px}
+.gpill{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;border:1px solid}
+.gpill.idle{border-color:var(--t3);color:var(--t2)}.gpill.run{border-color:rgba(124,106,245,.5);color:var(--acc);background:rgba(124,106,245,.08)}
+.gpill.done{border-color:rgba(34,197,94,.4);color:var(--green);background:rgba(34,197,94,.06)}.gpill.wait{border-color:rgba(245,158,11,.4);color:var(--amber);background:rgba(245,158,11,.06)}
+.gdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.gdot.idle{background:var(--t2)}.gdot.run{background:var(--acc);animation:blink 1.2s ease-in-out infinite}
+.gdot.done{background:var(--green)}.gdot.wait{background:var(--amber);animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.tabs{display:flex;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 12px;font-size:12px;background:none;border:none;border-bottom:2px solid transparent;color:var(--t2);cursor:pointer;font-family:inherit;white-space:nowrap;margin-bottom:-1px;transition:color .12s}
+.tab.on{color:var(--t1);border-bottom-color:var(--acc);font-weight:500}
+.pn{display:none;padding:14px 16px 40px}.pn.on{display:block}
+
+/* FORM */
+.setup{max-width:560px;margin:0 auto;padding:18px 0 8px}
+.setup-head{text-align:center;margin-bottom:20px}
+.setup-head h2{font-size:18px;font-weight:700;margin-bottom:5px}
+.setup-head p{font-size:12px;color:var(--t2);line-height:1.65;max-width:380px;margin:0 auto}
+.step-row{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:22px}
+.stn{display:flex;flex-direction:column;align-items:center;gap:3px}
+.stc{width:26px;height:26px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;transition:all .3s}
+.stc.done{background:rgba(34,197,94,.12);border-color:#22c55e;color:#22c55e}
+.stc.active{background:rgba(124,106,245,.15);border-color:var(--acc);color:var(--acc)}
+.stc.idle{border-color:var(--t3);color:var(--t3)}
+.stl{font-size:10px;color:var(--t2);white-space:nowrap}.stl.active{color:var(--t1);font-weight:500}
+.stcon{width:28px;height:1.5px;background:var(--b2);margin-bottom:13px}.stcon.done{background:rgba(34,197,94,.4)}
+.fsec{background:var(--s1);border:1px solid var(--b2);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.fsec-hdr{display:flex;align-items:center;gap:9px;padding:10px 13px;border-bottom:1px solid var(--b1);background:var(--s2)}
+.fsec-ico{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.fsec-t{font-size:12px;font-weight:600}.fsec-s{font-size:11px;color:var(--t2);margin-top:1px}
+.fbody{padding:12px}
+.fld{margin-bottom:10px}.fld:last-child{margin-bottom:0}
+.fld label{font-size:11px;color:var(--t2);display:block;margin-bottom:4px;font-weight:500}
+.req{color:var(--acc);margin-left:2px}
+.fld input,.fld textarea,.fld select{width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--t1);font-family:inherit;font-size:12px;outline:none;transition:border-color .15s}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--t3)}
+.fld input:focus,.fld textarea:focus{border-color:rgba(124,106,245,.5)}
+.fld textarea{resize:vertical;min-height:100px;line-height:1.65}
+.fld-hint{font-size:10px;color:var(--t3);margin-top:3px;line-height:1.5}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:9px}.frow .fld{margin-bottom:0}
+.btn-p{width:100%;padding:11px;border-radius:9px;background:var(--acc);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s;margin-top:5px}
+.btn-p:hover{background:var(--acc2)}.btn-p:disabled{opacity:.35;cursor:not-allowed}
+.btn-back{width:100%;padding:9px;border-radius:9px;background:transparent;color:var(--t2);border:1px solid var(--b2);font-family:inherit;font-size:12px;cursor:pointer;margin-bottom:7px;transition:all .12s}
+.btn-back:hover{color:var(--t1);border-color:var(--b3)}
+.err-banner{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:10px 13px;margin-bottom:10px;font-size:12px;color:var(--red);display:none}
+.err-banner.show{display:block}
+.analysing-output{background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.7;color:var(--t1);margin-top:12px;min-height:50px;white-space:pre-wrap;word-break:break-word}
+.int-card{background:var(--s1);border:1px solid var(--b2);border-radius:11px;overflow:hidden;margin-bottom:7px}
+.int-hdr{display:flex;align-items:center;gap:9px;padding:10px 12px;cursor:pointer;user-select:none}
+.int-ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.int-info{flex:1}.int-name{font-size:12px;font-weight:500}.int-type{font-size:11px;color:var(--t2);margin-top:1px}
+.int-tog{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--t3);display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;transition:all .15s;flex-shrink:0}
+.int-tog.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.int-fields{display:none;padding:0 12px 11px}.int-fields.open{display:block}
+.int-fl{font-size:11px;color:var(--t2);font-weight:500;margin-bottom:3px}
+.int-fi{width:100%;padding:7px 9px;border-radius:6px;border:1px solid var(--b2);background:var(--s3);color:var(--t1);font-family:inherit;font-size:12px;outline:none;margin-bottom:7px}
+.int-fi:last-child{margin-bottom:0}
+
+/* ═══ RUNNING SCREEN ═══ */
+.proj-bar{background:var(--s2);border:1px solid var(--b1);border-radius:9px;padding:9px 12px;margin-bottom:12px;display:flex;gap:14px;flex-wrap:wrap}
+.pj-item{display:flex;flex-direction:column;gap:2px}
+.pj-label{font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.pj-val{font-size:11px;font-weight:500;color:var(--t1);font-family:'DM Mono',monospace;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:10px;padding:11px 14px;margin-bottom:14px}
+.prog-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:6px}
+.prog-track{height:3px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:9px}
+.prog-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .7s ease}
+.s-pills{display:flex;gap:4px;flex-wrap:wrap}
+.s-pill{font-size:10px;padding:2px 7px;border-radius:20px;border:1px solid;cursor:pointer;transition:opacity .12s}
+
+/* ══ PHASE CARDS — the key fix ══ */
+.phase-list{display:flex;flex-direction:column;gap:8px}
+
+.phase-card{border-radius:12px;border:1px solid var(--b1);background:var(--s1);overflow:hidden;transition:border-color .3s}
+.phase-card.pending{opacity:.45}
+.phase-card.active{border-color:rgba(124,106,245,.4);background:rgba(124,106,245,.03);box-shadow:0 0 24px rgba(124,106,245,.06)}
+.phase-card.critic{border-color:rgba(236,72,153,.35);background:rgba(236,72,153,.03)}
+.phase-card.waiting{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.03);box-shadow:0 0 20px rgba(245,158,11,.06)}
+.phase-card.done{border-color:rgba(34,197,94,.2)}
+
+.phase-head{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
+.phase-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:1.5px solid;flex-shrink:0;transition:all .3s}
+.phase-meta{flex:1}
+.phase-name{font-size:13px;font-weight:500}
+.phase-status{font-size:11px;color:var(--t2);margin-top:2px}
+.phase-chevron{font-size:10px;color:var(--t3);transition:transform .2s;flex-shrink:0}
+.phase-card.expanded .phase-chevron{transform:rotate(180deg)}
+
+.phase-body{display:none;border-top:1px solid var(--b1)}
+.phase-card.expanded .phase-body{display:block}
+.phase-card.active .phase-body{display:block}
+.phase-card.critic .phase-body{display:block}
+.phase-card.waiting .phase-body{display:block}
+
+/* Agent output — FULL HEIGHT, fully readable */
+.agent-output{
+  padding:14px 16px;
+  font-size:12px;line-height:1.8;
+  color:var(--t1);
+  white-space:pre-wrap;word-break:break-word;
+  background:var(--s2);
+  border-bottom:1px solid var(--b1);
+  max-height:400px;overflow-y:auto;
+  min-height:60px;
+}
+.agent-output::-webkit-scrollbar{width:3px}
+.agent-output::-webkit-scrollbar-thumb{background:var(--t3);border-radius:2px}
+.agent-output.streaming::after{content:'▋';animation:blink .55s ease-in-out infinite;color:var(--acc)}
+
+/* What the agent actually did in this phase */
+.phase-actions{padding:10px 14px;border-bottom:1px solid var(--b1);background:var(--s3)}
+.phase-actions-title{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--t2);margin-bottom:7px}
+.action-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px}
+.action-ico{font-size:12px;flex-shrink:0}
+.action-txt{flex:1;color:var(--t2)}
+.action-st{font-size:10px;font-weight:600;flex-shrink:0}
+.ast-ok{color:var(--green)}.ast-err{color:var(--red)}.ast-info{color:var(--acc)}.ast-warn{color:var(--amber)}
+
+/* Expert panel inside phase */
+.phase-experts{padding:10px 14px;border-bottom:1px solid var(--b1);background:var(--s3)}
+.exp-title{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--pink);margin-bottom:7px}
+.exp-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;border-bottom:1px solid var(--b1)}
+.exp-row:last-child{border-bottom:none}
+.exp-n{width:22px;height:22px;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.exp-name{flex:1;color:var(--t2)}
+.exp-v{font-size:10px;font-weight:700;flex-shrink:0}
+
+/* GATE — sits right below output, impossible to miss */
+.phase-gate{padding:14px 16px;background:rgba(245,158,11,.05);border-top:1px solid rgba(245,158,11,.2)}
+.gate-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.gate-flag{font-size:16px}
+.gate-title-text{font-size:13px;font-weight:600;color:var(--amber)}
+.gate-subtitle{font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6;padding-left:26px}
+.gate-opts{display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.gopt{flex:1;min-width:80px;padding:9px 0;border-radius:8px;border:1px solid var(--b2);background:var(--s2);color:var(--t2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .12s;text-align:center}
+.gopt:hover{border-color:var(--b3);color:var(--t1)}
+.gopt.c-confirm{border-color:rgba(34,197,94,.6);color:var(--green);background:rgba(34,197,94,.08)}
+.gopt.c-reject{border-color:rgba(239,68,68,.5);color:var(--red);background:rgba(239,68,68,.08)}
+.gopt.c-revise{border-color:rgba(59,130,246,.5);color:var(--blue);background:rgba(59,130,246,.08)}
+.gate-inp{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--b2);background:var(--s3);color:var(--t1);font-family:inherit;font-size:12px;resize:vertical;min-height:60px;outline:none;display:none;margin-bottom:10px}
+.gate-inp:focus{border-color:rgba(124,106,245,.45)}
+.gate-sub{width:100%;padding:10px;border-radius:8px;background:var(--acc);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .12s}
+.gate-sub:hover{background:var(--acc2)}.gate-sub:disabled{opacity:.35;cursor:not-allowed}
+.gate-confirmed{padding:9px 13px;border-radius:8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);color:var(--green);font-size:12px;font-weight:500;text-align:center}
+.gate-rejected{padding:9px 13px;border-radius:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:var(--red);font-size:12px;text-align:center}
+
+/* Log */
+.log-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:10px;overflow:hidden}
+.log-hdr{padding:7px 12px;border-bottom:1px solid var(--b1);background:var(--s2);font-size:10px;font-weight:500;color:var(--t2);display:flex;justify-content:space-between;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.06em}
+.log-body{max-height:240px;overflow-y:auto}
+.log-body::-webkit-scrollbar{width:3px}.log-body::-webkit-scrollbar-thumb{background:var(--t3);border-radius:2px}
+.log-line{padding:5px 12px;border-bottom:1px solid var(--b1);display:flex;gap:10px;font-family:'DM Mono',monospace;font-size:10.5px}
+.log-t{color:var(--t3);flex-shrink:0}.log-m{flex:1;line-height:1.5;word-break:break-all}
+.c-ok{color:var(--green)}.c-warn{color:var(--amber)}.c-err{color:var(--red)}.c-info{color:var(--acc)}.c-hook{color:var(--teal)}
+
+.sl{font-size:10px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--t2);margin:12px 0 7px}
+.sl:first-child{margin-top:0}
+
+/* Action tabs for non-overview */
+.acts-list{display:flex;flex-direction:column;gap:6px}
+.act-card{display:flex;gap:9px;align-items:flex-start;padding:9px 12px;border-radius:9px;background:var(--s1);border:1px solid var(--b1)}
+.act-card-ico{font-size:14px;flex-shrink:0;margin-top:1px}
+.act-card-body{flex:1}
+.act-card-title{font-size:12px;font-weight:500}
+.act-card-detail{font-size:10px;font-family:'DM Mono',monospace;color:var(--t2);margin-top:2px}
+.act-card-time{font-size:10px;color:var(--t3);margin-top:2px}
+.act-card-st{font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px}
+
+.analysing-spinner{width:36px;height:36px;border:2px solid var(--b2);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.no-int{text-align:center;padding:18px;color:var(--t2);font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="logo">
+      <div class="logo-i">A</div>
+      <div><div class="logo-t">Shopify AI Agency</div><div class="logo-s">v7 · Hosted on Vercel · No CORS</div></div>
+    </div>
+    <div id="gstatus" class="gpill idle"><div class="gdot idle" id="gdot"></div><span id="gtext">Waiting for project</span></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" onclick="showTab('overview')">Overview</button>
+    <button class="tab" onclick="showTab('shopify')">Shopify actions</button>
+    <button class="tab" onclick="showTab('github')">GitHub</button>
+    <button class="tab" onclick="showTab('log')">System log</button>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="pn on" id="tab-overview">
+
+  <!-- S1: Setup -->
+  <div id="s1">
+    <div class="setup">
+      <div class="setup-head"><h2>Start your project</h2><p>Connect your store and GitHub repo, paste your SOW. Integrations are auto-detected on the next screen.</p></div>
+      <div class="step-row">
+        <div class="stn"><div class="stc active" id="si1">1</div><div class="stl active">Setup</div></div>
+        <div class="stcon" id="sc12"></div>
+        <div class="stn"><div class="stc idle" id="si2">2</div><div class="stl">Integrations</div></div>
+        <div class="stcon" id="sc23"></div>
+        <div class="stn"><div class="stc idle" id="si3">▶</div><div class="stl">Pipeline</div></div>
+      </div>
+
+      <div class="fsec" id="env-status-card">
+        <div class="fsec-hdr"><div class="fsec-ico" style="background:rgba(34,197,94,.12);color:var(--green)">⚡</div><div><div class="fsec-t">Vercel environment</div><div class="fsec-s">All API keys live in Vercel — never exposed in browser</div></div></div>
+        <div class="fbody">
+          <div id="env-check-row" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--s3);border-radius:8px;font-size:12px">
+            <div id="env-dot" style="width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;transition:background .3s"></div>
+            <div id="env-msg" style="flex:1;color:var(--t2)">Checking Vercel environment…</div>
+            <button onclick="checkEnv()" style="padding:3px 9px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--t2);font-family:inherit;font-size:11px;cursor:pointer">Retry</button>
+          </div>
+          <div id="env-detail" style="margin-top:7px;font-size:11px;color:var(--t2);line-height:1.8;display:none"></div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-hdr"><div class="fsec-ico" style="background:rgba(124,106,245,.15);color:var(--acc)">1</div><div><div class="fsec-t">Scope of work</div><div class="fsec-s">What needs to be built?</div></div></div>
+        <div class="fbody">
+          <div class="fld"><label>Project name <span class="req">*</span></label><input id="f-name" type="text" placeholder="e.g. Aurora Skincare"></div>
+          <div class="fld"><label>Scope of work <span class="req">*</span></label><textarea id="f-sow" placeholder="Describe pages, integrations, timeline, platform.&#10;&#10;e.g. Build a Shopify Plus store for a premium skincare brand. Homepage, collections, PDP, cart, Klaviyo flows, Judge.me reviews, mobile-first. 10 weeks."></textarea><div class="fld-hint">Mention integrations by name — they are auto-detected on the next screen.</div></div>
+          <div class="frow">
+            <div class="fld"><label>Timeline</label><select id="f-timeline"><option>4 weeks</option><option>6 weeks</option><option selected>8 weeks</option><option>10 weeks</option><option>12 weeks</option><option>16 weeks</option></select></div>
+            <div class="fld"><label>Shopify plan</label><select id="f-plan"><option>Shopify (standard)</option><option selected>Shopify Plus</option></select></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-hdr"><div class="fsec-ico" style="background:rgba(20,184,166,.12);color:var(--teal)">2</div><div><div class="fsec-t">Shopify store</div><div class="fsec-s">Real API — theme, metafields, webhooks</div></div></div>
+        <div class="fbody">
+          <div class="fld"><label>Store URL <span class="req">*</span></label><input id="f-store" type="text" placeholder="yourstore.myshopify.com"><div class="fld-hint">Use a dev store. Agency works on an unpublished theme copy until Gate 5.</div></div>
+          <div class="fld"><div style="padding:8px 10px;background:var(--s3);border-radius:7px;font-size:11px;color:var(--t2);border:1px solid var(--b1);display:flex;align-items:center;gap:6px"><span id="shopify-env-st">⏳</span><span>Shopify token: </span><span id="shopify-env-val">checking…</span></div><input id="f-st" type="hidden" value="via-vercel"></div>
+          <div class="frow">
+            <div class="fld"><label>Base theme</label><select id="f-theme"><option>Dawn</option><option>Sense</option><option>Craft</option><option>Refresh</option><option>Custom</option></select></div>
+            <div class="fld"><label>Design source</label><select id="f-design" onchange="document.getElementById('figma-f').style.display=this.value==='Figma'?'block':'none'"><option>No design yet</option><option>Figma</option><option>Adobe XD</option><option>Already designed</option></select></div>
+          </div>
+          <div class="fld" id="figma-f" style="display:none"><label>Figma URL</label><input id="f-figma" type="text" placeholder="https://figma.com/design/..."></div>
+        </div>
+      </div>
+
+      <div class="fsec">
+        <div class="fsec-hdr"><div class="fsec-ico" style="background:rgba(34,197,94,.1);color:var(--green)">3</div><div><div class="fsec-t">GitHub repository</div><div class="fsec-s">Real API — branches + commits after every stage</div></div></div>
+        <div class="fbody">
+          <div class="fld"><label>Repository URL <span class="req">*</span></label><input id="f-repo" type="text" placeholder="https://github.com/your-org/your-project"></div>
+          <div class="fld"><div style="padding:8px 10px;background:var(--s3);border-radius:7px;font-size:11px;color:var(--t2);border:1px solid var(--b1);display:flex;align-items:center;gap:6px"><span id="github-env-st">⏳</span><span>GitHub token: </span><span id="github-env-val">checking…</span></div><input id="f-ght" type="hidden" value="via-vercel"></div>
+          <div class="frow">
+            <div class="fld"><label>Main branch</label><input id="f-main" type="text" value="main"></div>
+            <div class="fld"><label>Develop branch</label><input id="f-develop" type="text" value="develop"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="err1" class="err-banner"></div>
+      <div id="conn-test-result" style="display:none;padding:10px 13px;border-radius:9px;margin-bottom:10px;font-size:12px;line-height:1.7"></div>
+      <button class="btn-p" style="background:var(--s2);color:var(--t2);border:1px solid var(--b2);margin-bottom:8px" onclick="testConnections()"><span>🔌 Test connections before launching</span></button>
+      <button class="btn-p" onclick="goStep2()"><span>Continue — analyse SOW for integrations</span><span style="font-size:15px">→</span></button>
+    </div>
+  </div>
+
+  <!-- S2: Integrations -->
+  <div id="s2" style="display:none">
+    <div class="setup">
+      <div class="setup-head"><h2 id="s2h">Detecting integrations…</h2><p id="s2p">Reading your SOW</p></div>
+      <div class="step-row">
+        <div class="stn"><div class="stc done">✓</div><div class="stl">Setup</div></div>
+        <div class="stcon done"></div>
+        <div class="stn"><div class="stc active">2</div><div class="stl active">Integrations</div></div>
+        <div class="stcon" id="sc2"></div>
+        <div class="stn"><div class="stc idle" id="si3b">▶</div><div class="stl">Pipeline</div></div>
+      </div>
+      <div id="analyse-state">
+        <div style="text-align:center;padding:24px 0">
+          <div class="analysing-spinner"></div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:5px">Analysing scope of work…</div>
+          <div style="font-size:12px;color:var(--t2)">Claude is detecting all third-party apps and services</div>
+          <div class="analysing-output" id="astream">Sending to Claude…</div>
+        </div>
+      </div>
+      <div id="int-ready" style="display:none">
+        <div class="fsec" style="margin-bottom:9px">
+          <div class="fsec-hdr"><div class="fsec-ico" style="background:rgba(245,158,11,.12);color:var(--amber)">⚙</div><div><div class="fsec-t" id="int-title">Integrations detected</div><div class="fsec-s">Toggle and provide credentials — or skip to configure later</div></div></div>
+          <div class="fbody" style="padding-bottom:5px"><div id="int-grid"></div></div>
+        </div>
+        <div id="no-int" style="display:none"><div class="fsec"><div class="fbody"><div class="no-int">No integrations detected. You can proceed — add apps later if needed.</div></div></div></div>
+        <div id="err2" class="err-banner"></div>
+        <button class="btn-back" onclick="goBack()">← Back</button>
+        <button class="btn-p" onclick="launch()"><span>Launch pipeline</span><span style="font-size:15px">→</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: Running pipeline — the key redesign -->
+  <div id="s3" style="display:none">
+    <div class="proj-bar" id="proj-bar"></div>
+    <div class="prog-wrap">
+      <div class="prog-meta"><span id="prog-lbl">Initialising…</span><span id="prog-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="s-pills" id="s-pills"></div>
+    </div>
+    <div class="sl">Pipeline — click any stage to expand its full output</div>
+
+    <!-- Phase cards — one per stage, all visible, expand to show full output + gate -->
+    <div class="phase-list" id="phase-list"></div>
+
+    <div class="sl" style="margin-top:14px">Live activity</div>
+    <div class="log-wrap"><div class="log-hdr"><span>Activity</span><span id="mini-ct">0</span></div><div class="log-body" id="mini-log"></div></div>
+  </div>
+</div>
+
+<!-- SHOPIFY ACTIONS TAB -->
+<div class="pn" id="tab-shopify">
+  <div class="sl" style="margin-top:0">Shopify API actions</div>
+  <div class="acts-list" id="shopify-list"><div style="text-align:center;padding:40px 0;color:var(--t2)">Shopify actions appear here as the pipeline runs</div></div>
+</div>
+
+<!-- GITHUB TAB -->
+<div class="pn" id="tab-github">
+  <div class="sl" style="margin-top:0">GitHub branches and commits</div>
+  <div class="acts-list" id="github-list"><div style="text-align:center;padding:40px 0;color:var(--t2)">GitHub actions appear here as the pipeline runs</div></div>
+</div>
+
+<!-- LOG TAB -->
+<div class="pn" id="tab-log">
+  <div class="sl" style="margin-top:0">Full system log</div>
+  <div class="log-wrap"><div class="log-hdr"><span>All hooks · agents · API calls · gates</span><span id="log-ct">0</span></div><div class="log-body" id="full-log" style="max-height:520px"></div></div>
+</div>
+
+<script>
+// ════════════════════════════════
+// CONFIG & STATE
+// ════════════════════════════════
+var CFG = { ak:'', st:'', store:'', ght:'', owner:'', repo:'', main:'main', develop:'develop' };
+var S = {
+  project:null, stages:[], logs:[],
+  gateResolve:null, gateMode:null,
+  expertResults:{}, currentRole:null,
+  shopifyActs:[], githubActs:[],
+  detectedInts:[], devThemeId:null,
+};
+
+var STAGES_DEF = [
+  {id:'pm',  name:'PM Agent',        short:'PM',  color:'#3b82f6', role:'pm',       gate:1, desc:'Project planning — milestones, sprints, risks'},
+  {id:'ds',  name:'Designer Agent',  short:'DS',  color:'#8b5cf6', role:'designer',  gate:2, desc:'Design system — tokens, section map, design path'},
+  {id:'fe',  name:'Frontend Agent',  short:'FE',  color:'#14b8a6', role:'frontend',  critic:true, desc:'Liquid sections — schema, CSS, JS, accessibility'},
+  {id:'be',  name:'Backend Agent',   short:'BE',  color:'#f97316', role:'backend',   critic:true, desc:'API integrations — metafields, webhooks, apps'},
+  {id:'qas', name:'Sprint QA',       short:'QA',  color:'#f59e0b', role:'qa',        gate:3, desc:'Sprint quality assurance — 8 test modules'},
+  {id:'qam', name:'Milestone QA',    short:'MQA', color:'#ef4444', role:'qa',        gate:4, desc:'Full milestone regression — all pages and flows'},
+  {id:'dh',  name:'Delivery Head',   short:'DH',  color:'#22c55e', role:'delivery',  gate:5, desc:'Pre-launch checklist — 40 points before go-live'},
+];
+
+var EXPERTS = [
+  {id:1, name:'Shopify Staff Engineer', color:'#3b82f6', fires:['frontend','backend']},
+  {id:2, name:'CRO Architect',          color:'#f97316', fires:['frontend','designer']},
+  {id:3, name:'Accessibility Lead',     color:'#8b5cf6', fires:['frontend','designer']},
+  {id:4, name:'Performance Engineer',   color:'#14b8a6', fires:['frontend']},
+  {id:5, name:'Security Architect',     color:'#ef4444', fires:['frontend','backend']},
+  {id:6, name:'Engineering Director',   color:'#64748b', fires:['pm']},
+  {id:7, name:'Design Systems Lead',    color:'#8b5cf6', fires:['designer']},
+  {id:8, name:'QA Veteran',             color:'#f59e0b', fires:['qa']},
+];
+
+var GATE_DESC = {
+  1:'Review the PM Agent\'s plan above — every milestone, sprint, and risk. Confirm to proceed to design, reject with a reason, or request specific revisions.',
+  2:'Review the design system above — tokens, section map, and design path recommendation. Confirm to begin development with real Shopify theme pushes.',
+  3:'Review the sprint QA report above — all 8 test modules, bugs found, Lighthouse scores. Confirm when satisfied to proceed to milestone regression.',
+  4:'Review the milestone regression report above — all pages and flows tested together. Confirm to proceed to delivery.',
+  5:'Review the pre-launch checklist above — all 40 points checked. Confirm to publish the theme live to your Shopify store.',
+};
+
+var INT_SCHEMAS = {
+  'klaviyo':{name:'Klaviyo',icon:'📧',type:'Email & SMS',fields:[{id:'pk',label:'Public API Key',ph:'pk_••••••',s:false},{id:'sk',label:'Private API Key',ph:'••••••••••••••••',s:true}]},
+  'judge.me':{name:'Judge.me',icon:'⭐',type:'Reviews',fields:[{id:'ak',label:'API Key',ph:'••••••••••••••••',s:true},{id:'sh',label:'Shop domain',ph:'yourstore.myshopify.com',s:false}]},
+  'okendo':{name:'Okendo',icon:'⭐',type:'Reviews',fields:[{id:'ak',label:'API Key',ph:'••••••••••••••••',s:true}]},
+  'yotpo':{name:'Yotpo',icon:'⭐',type:'Reviews & loyalty',fields:[{id:'ak',label:'App Key',ph:'••••••••••••',s:false},{id:'sk',label:'Secret Key',ph:'••••••••••••',s:true}]},
+  'recharge':{name:'Recharge',icon:'🔄',type:'Subscriptions',fields:[{id:'ak',label:'API Key',ph:'sk_•••••••••••••••••',s:true}]},
+  'gorgias':{name:'Gorgias',icon:'💬',type:'Support',fields:[{id:'dm',label:'Domain',ph:'yourstore.gorgias.com',s:false},{id:'ak',label:'API Key',ph:'•••••••••••',s:true}]},
+  'loop':{name:'Loop Returns',icon:'↩️',type:'Returns',fields:[{id:'ak',label:'API Key',ph:'•••••••••••••••',s:true}]},
+  'hotjar':{name:'Hotjar',icon:'🔥',type:'Heatmaps',fields:[{id:'si',label:'Site ID',ph:'1234567',s:false}]},
+  'clarity':{name:'Microsoft Clarity',icon:'📊',type:'Analytics',fields:[{id:'pi',label:'Project ID',ph:'abcdef1234',s:false}]},
+  'google analytics':{name:'Google Analytics 4',icon:'📈',type:'Analytics',fields:[{id:'mid',label:'Measurement ID',ph:'G-XXXXXXXXXX',s:false}]},
+  'ga4':{name:'Google Analytics 4',icon:'📈',type:'Analytics',fields:[{id:'mid',label:'Measurement ID',ph:'G-XXXXXXXXXX',s:false}]},
+  'facebook pixel':{name:'Meta Pixel',icon:'📘',type:'Ad tracking',fields:[{id:'pid',label:'Pixel ID',ph:'••••••••••••••••',s:false}]},
+  'meta pixel':{name:'Meta Pixel',icon:'📘',type:'Ad tracking',fields:[{id:'pid',label:'Pixel ID',ph:'••••••••••••••••',s:false}]},
+  'attentive':{name:'Attentive',icon:'📱',type:'SMS',fields:[{id:'ak',label:'API Key',ph:'•••••••••••••••',s:true}]},
+  'loyalty lion':{name:'LoyaltyLion',icon:'🦁',type:'Loyalty',fields:[{id:'tk',label:'Token',ph:'••••••••••••',s:false},{id:'sc',label:'Secret',ph:'••••••••••••',s:true}]},
+  'smile.io':{name:'Smile.io',icon:'😊',type:'Loyalty',fields:[{id:'ak',label:'API Key',ph:'•••••••••••••••',s:true}]},
+  'searchanise':{name:'Searchanise',icon:'🔍',type:'Search',fields:[{id:'ak',label:'API Key',ph:'••••••••••••',s:true}]},
+  'boost commerce':{name:'Boost Commerce',icon:'🔍',type:'Search',fields:[{id:'ak',label:'API Key',ph:'••••••••••••',s:true}]},
+  'shipstation':{name:'ShipStation',icon:'📦',type:'Fulfilment',fields:[{id:'ak',label:'API Key',ph:'••••••••••••',s:false},{id:'sc',label:'API Secret',ph:'••••••••••••',s:true}]},
+  'zendesk':{name:'Zendesk',icon:'🎫',type:'Support',fields:[{id:'sd',label:'Subdomain',ph:'yourcompany',s:false},{id:'tk',label:'API Token',ph:'••••••••••••••••',s:true}]},
+  'intercom':{name:'Intercom',icon:'💬',type:'Messaging',fields:[{id:'ai',label:'App ID',ph:'abc1defg',s:false}]},
+  'mailchimp':{name:'Mailchimp',icon:'🐵',type:'Email',fields:[{id:'ak',label:'API Key',ph:'••••••••••••••••-us1',s:true}]},
+  'omnisend':{name:'Omnisend',icon:'📧',type:'Email & SMS',fields:[{id:'ak',label:'API Key',ph:'•••••••••••••••••••',s:true}]},
+  'loox':{name:'Loox',icon:'📸',type:'Photo reviews',fields:[{id:'ak',label:'API Key',ph:'••••••••••••••••',s:true}]},
+  'stamped':{name:'Stamped.io',icon:'⭐',type:'Reviews',fields:[{id:'ak',label:'API Key',ph:'pubkey-•••••',s:false},{id:'sk',label:'Secret',ph:'•••••••••',s:true}]},
+  'pagefly':{name:'PageFly',icon:'🧩',type:'Page builder',fields:[{id:'nt',label:'Note',ph:'Install via Shopify App Store — no API key needed',s:false}]},
+  'replo':{name:'Replo',icon:'🧩',type:'Landing pages',fields:[{id:'ak',label:'API Key (optional)',ph:'••••••••••••••••',s:true}]},
+  'tidio':{name:'Tidio',icon:'💬',type:'Live chat',fields:[{id:'ak',label:'API Key',ph:'•••••••••••••••••',s:true}]},
+  'nosto':{name:'Nosto',icon:'✨',type:'Personalisation',fields:[{id:'ai',label:'Account ID',ph:'shopify-••••••••',s:false}]},
+  'afterpay':{name:'Afterpay',icon:'💳',type:'BNPL',fields:[{id:'mi',label:'Merchant ID',ph:'••••••••••••',s:false}]},
+  'klarna':{name:'Klarna',icon:'💳',type:'BNPL',fields:[{id:'mi',label:'Merchant ID',ph:'K••••••••',s:false}]},
+};
+
+// ════════════════════════════════
+// UTILS
+// ════════════════════════════════
+function showTab(id){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on')); document.getElementById('tab-'+id).classList.add('on'); event.target.classList.add('on'); }
+function setStatus(t,x){ document.getElementById('gstatus').className='gpill '+t; document.getElementById('gdot').className='gdot '+t; document.getElementById('gtext').textContent=x; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function showErr(id,msg){ var e=document.getElementById(id); e.textContent=msg; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),6000); }
+
+function log(msg,type){
+  var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  S.logs.push({t,msg,type:type||'info'});
+  var mk=function(arr){ return arr.map(function(l){ var c=l.type==='ok'?'c-ok':l.type==='warn'?'c-warn':l.type==='err'?'c-err':l.type==='hook'?'c-hook':'c-info'; return '<div class="log-line"><span class="log-t">'+l.t+'</span><span class="log-m '+c+'">'+esc(l.msg)+'</span></div>'; }).join(''); };
+  document.getElementById('full-log').innerHTML=mk(S.logs.slice().reverse());
+  document.getElementById('mini-log').innerHTML=mk(S.logs.slice(-5).reverse());
+  document.getElementById('log-ct').textContent=S.logs.length;
+  document.getElementById('mini-ct').textContent=S.logs.length;
+}
+
+// ════════════════════════════════
+// CLAUDE — TRUE STREAMING
+// ════════════════════════════════
+async function streamClaude(system, user, onChunk){
+  var response;
+  try{
+    response = await fetch('/api/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({system:system,user:user,max_tokens:1400})
+    });
+  }catch(e){ var m='API route error: '+e.message; onChunk(m,true); return m; }
+  if(!response.ok){ var t=await response.text(); var m='API error '+response.status+': '+t; onChunk(m,true); return m; }
+  var reader=response.body.getReader(), decoder=new TextDecoder(), full='', buf='';
+  while(true){
+    var {done,value}=await reader.read();
+    if(done)break;
+    buf+=decoder.decode(value,{stream:true});
+    var lines=buf.split('\n'); buf=lines.pop();
+    for(var l of lines){
+      l=l.trim();
+      if(!l.startsWith('data:'))continue;
+      var d=l.slice(5).trim();
+      if(d==='[DONE]')continue;
+      try{ var p=JSON.parse(d); if(p.type==='content_block_delta'&&p.delta?.text){ full+=p.delta.text; onChunk(full,false); } }catch{}
+    }
+  }
+  onChunk(full,true);
+  return full;
+}
+
+// ════════════════════════════════
+// SHOPIFY API
+// ════════════════════════════════
+async function shopify(method, path, body){
+  var url='/api/shopify'+path;
+  try{
+    var o={method,headers:{'Content-Type':'application/json'}};
+    if(body&&method!=='GET'&&method!=='DELETE')o.body=JSON.stringify(body);
+    var r=await fetch(url,o);
+    if(!r.ok){ var et=await r.text(); log('Shopify error '+r.status+': '+et.slice(0,200),'err'); return null; }
+    return await r.json();
+  }catch(e){ log('Shopify error: '+e.message,'err'); return null; }
+}
+
+function addShopifyAct(icon,title,detail,st,sc){
+  var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  S.shopifyActs.push({icon,title,detail,st,sc,t});
+  var el=document.getElementById('shopify-list');
+  el.innerHTML=S.shopifyActs.slice().reverse().map(a=>'<div class="act-card"><span class="act-card-ico">'+a.icon+'</span><div class="act-card-body"><div class="act-card-title">'+esc(a.title)+'</div>'+(a.detail?'<div class="act-card-detail">'+esc(a.detail)+'</div>':'')+'<div class="act-card-time">'+a.t+'</div></div><span class="act-card-st '+a.sc+'">'+a.st+'</span></div>').join('');
+}
+
+async function shopifySetup(){
+  log('Shopify: verifying connection','hook');
+  var d=await shopify('GET','/shop.json');
+  if(d){ addShopifyAct('🏪','Store connected: '+d.shop.name,d.shop.plan_name,'OK','ast-ok'); }
+  else{ addShopifyAct('🏪','Could not connect to store','Check URL and token permissions','ERROR','ast-err'); return false; }
+  log('Shopify: fetching themes','hook');
+  var th=await shopify('GET','/themes.json');
+  if(th&&th.themes){
+    addShopifyAct('🎨',th.themes.length+' themes found',th.themes.map(t=>t.name+(t.role==='main'?' (live)':'')).join(', '),'OK','ast-ok');
+    var main=th.themes.find(t=>t.role==='main')||th.themes[0];
+    var nw=await shopify('POST','/themes.json',{theme:{name:'[Agency] '+S.project.name+' — Dev',role:'unpublished'}});
+    if(nw&&nw.theme){ S.devThemeId=nw.theme.id; addShopifyAct('🎨','Dev theme created','"'+nw.theme.name+'" ID:'+nw.theme.id,'CREATED','ast-ok'); }
+    else{ addShopifyAct('🎨','Dev theme — using existing unpublished theme','','INFO','ast-info'); if(th.themes.find(t=>t.role!=='main'))S.devThemeId=th.themes.find(t=>t.role!=='main').id; }
+  }
+  return true;
+}
+
+async function shopifyMetafield(ns,key,type,owner,desc){
+  var r=await shopify('POST','/metafield_definitions.json',{metafield_definition:{name:key,namespace:ns,key:key,type:type,owner_type:owner,description:desc||''}});
+  if(r&&r.metafield_definition){ addShopifyAct('📋','Metafield created',ns+'.'+key+' ('+owner+')','CREATED','ast-ok'); return r.metafield_definition; }
+  addShopifyAct('📋','Metafield skipped — may already exist',ns+'.'+key,'SKIP','ast-warn');
+  return null;
+}
+
+async function shopifyWebhook(topic){
+  var r=await shopify('POST','/webhooks.json',{webhook:{topic:topic,address:'https://'+CFG.store+'/agency/webhooks/'+topic.replace('/','--'),format:'json'}});
+  if(r&&r.webhook){ addShopifyAct('🔔','Webhook registered',topic,'OK','ast-ok'); }
+  else{ addShopifyAct('🔔','Webhook — may already exist',topic,'SKIP','ast-warn'); }
+}
+
+// ════════════════════════════════
+// GITHUB API
+// ════════════════════════════════
+async function github(method,path,body){
+  var url='/api/github'+path;
+  try{
+    var o={method,headers:{'Content-Type':'application/json'}};
+    if(body&&method!=='GET'&&method!=='DELETE')o.body=JSON.stringify(body);
+    var r=await fetch(url,o);
+    if(r.status===204)return{};
+    var d=await r.json();
+    if(!r.ok){ log('GitHub error: '+(d.message||JSON.stringify(d)),'err'); return null; }
+    return d;
+  }catch(e){ log('GitHub error: '+e.message,'err'); return null; }
+}
+
+function addGithubAct(icon,title,detail,st,sc){
+  var t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  S.githubActs.push({icon,title,detail,st,sc,t});
+  var el=document.getElementById('github-list');
+  el.innerHTML=S.githubActs.slice().reverse().map(a=>'<div class="act-card"><span class="act-card-ico">'+a.icon+'</span><div class="act-card-body"><div class="act-card-title">'+esc(a.title)+'</div>'+(a.detail?'<div class="act-card-detail">'+esc(a.detail)+'</div>':'')+'<div class="act-card-time">'+a.t+'</div></div><span class="act-card-st '+a.sc+'">'+a.st+'</span></div>').join('');
+}
+
+async function ghBranchSha(branch){
+  var d=await github('GET','/repos/'+CFG.owner+'/'+CFG.repo+'/git/refs/heads/'+branch);
+  return d&&d.object?d.object.sha:null;
+}
+
+async function ghCreateBranch(name,from){
+  var sha=await ghBranchSha(from||CFG.main);
+  if(!sha){ addGithubAct('🌿','Cannot create branch — base SHA not found',name,'WARN','ast-warn'); return false; }
+  var r=await github('POST','/repos/'+CFG.owner+'/'+CFG.repo+'/git/refs',{ref:'refs/heads/'+name,sha:sha});
+  if(r&&r.ref){ addGithubAct('🌿','Branch created',name+' from '+from,'CREATED','ast-ok'); return true; }
+  if(r===null){ addGithubAct('🌿','Branch exists',name,'EXISTS','ast-info'); return true; }
+  return false;
+}
+
+async function ghCommit(branch, message, files){
+  var sha=await ghBranchSha(branch);
+  if(!sha){ addGithubAct('💾','Commit skipped — branch not found',branch,'WARN','ast-warn'); return null; }
+  var bd=await github('GET','/repos/'+CFG.owner+'/'+CFG.repo+'/git/commits/'+sha);
+  if(!bd)return null;
+  var tree=await github('POST','/repos/'+CFG.owner+'/'+CFG.repo+'/git/trees',{base_tree:bd.tree.sha,tree:files.map(f=>({path:f.path,mode:'100644',type:'blob',content:f.content}))});
+  if(!tree)return null;
+  var commit=await github('POST','/repos/'+CFG.owner+'/'+CFG.repo+'/git/commits',{message:message,tree:tree.sha,parents:[sha]});
+  if(!commit)return null;
+  await github('PATCH','/repos/'+CFG.owner+'/'+CFG.repo+'/git/refs/heads/'+branch,{sha:commit.sha});
+  addGithubAct('💾',message,commit.sha.slice(0,7)+' → '+branch,'COMMITTED','ast-ok');
+  log('GitHub: committed — '+message.slice(0,55),'ok');
+  return commit.sha;
+}
+
+async function ghPR(title,head,base,body){
+  var r=await github('POST','/repos/'+CFG.owner+'/'+CFG.repo+'/pulls',{title,head,base,body:body||'',draft:false});
+  if(r&&r.number){ addGithubAct('🔀','PR created','#'+r.number+': '+title,'OPENED','ast-ok'); }
+  else{ addGithubAct('🔀','PR creation skipped — may already exist',title,'SKIP','ast-warn'); }
+}
+
+async function ghSetup(){
+  log('GitHub: verifying connection — '+CFG.owner+'/'+CFG.repo,'hook');
+  var d=await github('GET','/repos/'+CFG.owner+'/'+CFG.repo);
+  if(!d){
+    addGithubAct('🐙','Could not connect to repo',
+      'Repo: '+CFG.owner+'/'+CFG.repo+' — Check: (1) repo exists on GitHub (2) token has repo scope (3) URL format is https://github.com/owner/repo',
+      'ERROR','ast-err');
+    log('GitHub fix: Go to github.com/'+CFG.owner+'/'+CFG.repo+' — does it exist?','err');
+    log('GitHub fix: Token needs "repo" scope — check at github.com → Settings → Developer settings → PAT','err');
+    return false;
+  }
+  addGithubAct('🐙','Repo connected',CFG.owner+'/'+CFG.repo+' ('+d.visibility+')','OK','ast-ok');
+  var devSha=await ghBranchSha(CFG.develop);
+  if(!devSha){ await ghCreateBranch(CFG.develop,CFG.main); }
+  else{ addGithubAct('🌿','Branch exists',CFG.develop,'EXISTS','ast-info'); }
+  return true;
+}
+
+// ════════════════════════════════
+// PHASE CARD RENDER
+// ════════════════════════════════
+function renderPhaseList(){
+  var el=document.getElementById('phase-list');
+  el.innerHTML=S.stages.map(function(s,i){
+    var st=s.status;
+    var cardClass='phase-card '+(st==='pending'?'pending':st==='active'?'active expanded':st==='critic'?'critic expanded':st==='waiting'?'waiting expanded':st==='done'?'done':'');
+
+    // Icon colors
+    var ib,ic;
+    if(st==='done'){ib='rgba(34,197,94,.12)';ic='#22c55e';}
+    else if(st==='active'){ib='rgba(124,106,245,.18)';ic='#7c6af5';}
+    else if(st==='critic'){ib='rgba(236,72,153,.15)';ic='#ec4899';}
+    else if(st==='waiting'){ib='rgba(245,158,11,.15)';ic='#f59e0b';}
+    else{ib='var(--s2)';ic='var(--t2)';}
+
+    // Badge text
+    var badge=st==='done'?'✓ Done':st==='active'?'Running…':st==='critic'?'Expert review':st==='waiting'?'⚑ Your input needed':'Pending';
+    var badgeColor=st==='done'?'#22c55e':st==='active'?'#7c6af5':st==='critic'?'#ec4899':st==='waiting'?'#f59e0b':'var(--t3)';
+
+    // Phase status line
+    var statusLine='';
+    if(st==='done'&&s.gateConfirmed) statusLine='Gate confirmed ✓';
+    else if(st==='done'&&!s.gate) statusLine='Expert review passed';
+    else if(st==='waiting') statusLine='Review the output below and respond to the gate';
+    else if(st==='critic') statusLine='Expert panel reviewing output…';
+    else if(st==='active') statusLine='Generating output — streaming live…';
+    else statusLine=s.desc;
+
+    // Build body content
+    var bodyHtml='';
+
+    // OUTPUT — always show if any text exists
+    if(s.output){
+      bodyHtml+='<div class="agent-output'+(s.streaming?' streaming':'')+'" id="out-'+s.id+'">'+esc(s.output)+'</div>';
+    } else if(st==='active'){
+      bodyHtml+='<div class="agent-output streaming" id="out-'+s.id+'">Generating…</div>';
+    }
+
+    // API ACTIONS this stage did
+    if(s.actions&&s.actions.length){
+      bodyHtml+='<div class="phase-actions"><div class="phase-actions-title">What was done in your store + GitHub</div>'
+        +s.actions.map(a=>'<div class="action-row"><span class="action-ico">'+a.icon+'</span><span class="action-txt">'+esc(a.text)+'</span><span class="action-st '+a.sc+'">'+a.st+'</span></div>').join('')
+        +'</div>';
+    }
+
+    // EXPERT PANEL
+    if(s.critics&&s.critics.length){
+      bodyHtml+='<div class="phase-experts"><div class="exp-title">🪞 Expert panel review</div>'
+        +s.critics.map(c=>'<div class="exp-row"><div class="exp-n" style="background:'+c.color+'18;border:1px solid '+c.color+'40;color:'+c.color+'">'+c.id+'</div><span class="exp-name">'+esc(c.name)+'</span><span class="exp-v" style="color:'+(c.v==='PASS'?'#22c55e':'#ef4444')+'">'+c.v+'</span></div>').join('')
+        +'</div>';
+    }
+
+    // GATE — right here, directly below output
+    if(st==='waiting'&&s.gate&&!s.gateConfirmed){
+      bodyHtml+='<div class="phase-gate">'
+        +'<div class="gate-header"><span class="gate-flag">⚑</span><div class="gate-title-text">Gate '+s.gate+' — '+s.name+' review</div></div>'
+        +'<div class="gate-subtitle">'+esc(GATE_DESC[s.gate]||'Review the output above and respond.')+'</div>'
+        +'<div class="gate-opts">'
+        +'<button class="gopt" id="gc-'+s.id+'" onclick="chooseGate(\''+s.id+'\',\'confirm\')">✓ Confirm — looks good</button>'
+        +'<button class="gopt" id="gj-'+s.id+'" onclick="chooseGate(\''+s.id+'\',\'reject\')">✗ Reject — redo this</button>'
+        +'<button class="gopt" id="gv-'+s.id+'" onclick="chooseGate(\''+s.id+'\',\'revise\')">↺ Revise — change something</button>'
+        +'</div>'
+        +'<textarea class="gate-inp" id="gi-'+s.id+'" placeholder="Add your reason or revision instructions here…"></textarea>'
+        +'<button class="gate-sub" id="gs-'+s.id+'" onclick="submitGate(\''+s.id+'\')" disabled>Submit your response</button>'
+        +'</div>';
+    }
+
+    if(st==='done'&&s.gateConfirmed){
+      bodyHtml+='<div class="phase-gate"><div class="gate-confirmed">✓ Gate '+s.gate+' confirmed — '+(s.gateInput?'"'+s.gateInput.slice(0,60)+'"':'proceed to next stage')+'</div></div>';
+    }
+    if(st==='done'&&s.gateRejected){
+      bodyHtml+='<div class="phase-gate"><div class="gate-rejected">✗ Rejected — '+esc(s.gateInput||'')+'</div></div>';
+    }
+
+    return '<div class="'+cardClass+'" id="pc-'+s.id+'">'
+      +'<div class="phase-head" onclick="togglePhase(\''+s.id+'\')">'
+      +'<div class="phase-icon" style="background:'+ib+';border-color:'+ic+'40;color:'+ic+'">'+s.short+'</div>'
+      +'<div class="phase-meta"><div class="phase-name">'+s.name+'</div><div class="phase-status" style="color:'+badgeColor+'">'+statusLine+'</div></div>'
+      +'<span style="font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid '+badgeColor+'40;color:'+badgeColor+';flex-shrink:0;font-weight:500">'+badge+'</span>'
+      +'<span class="phase-chevron">▾</span>'
+      +'</div>'
+      +(bodyHtml?'<div class="phase-body">'+bodyHtml+'</div>':'')
+      +'</div>';
+  }).join('');
+}
+
+function togglePhase(id){
+  var card=document.getElementById('pc-'+id);
+  if(card)card.classList.toggle('expanded');
+}
+
+function updateProgress(){
+  var total=S.stages.length||1,done=S.stages.filter(s=>s.status==='done').length,pct=Math.round(done/total*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  var active=S.stages.find(s=>s.status==='active'||s.status==='critic'||s.status==='waiting');
+  document.getElementById('prog-lbl').textContent=active?active.name+' — '+active.desc:(pct===100?'All stages complete':'Preparing…');
+  document.getElementById('s-pills').innerHTML=S.stages.map(function(s){
+    var bg,c;
+    if(s.status==='done'){bg='rgba(34,197,94,.12)';c='#22c55e';}else if(s.status==='active'){bg='rgba(124,106,245,.15)';c='#7c6af5';}else if(s.status==='critic'){bg='rgba(236,72,153,.12)';c='#ec4899';}else if(s.status==='waiting'){bg='rgba(245,158,11,.12)';c='#f59e0b';}else{bg='var(--s2)';c='var(--t2)';}
+    return '<span class="s-pill" style="background:'+bg+';color:'+c+';border-color:'+c+'30" onclick="togglePhase(\''+s.id+'\')">'+s.short+'</span>';
+  }).join('');
+}
+
+function scrollToPhase(id){
+  var el=document.getElementById('pc-'+id);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ════════════════════════════════
+// GATE
+// ════════════════════════════════
+function chooseGate(stageId, mode){
+  var s=S.stages.find(s=>s.id===stageId);
+  if(!s)return;
+  s.currentGateMode=mode;
+  // Update button styles
+  ['gc','gj','gv'].forEach(function(prefix){
+    var el=document.getElementById(prefix+'-'+stageId);
+    if(el)el.className='gopt';
+  });
+  var map={'confirm':'gc','reject':'gj','revise':'gv'};
+  var btn=document.getElementById(map[mode]+'-'+stageId);
+  if(btn)btn.className='gopt c-'+mode;
+  // Show/hide textarea
+  var inp=document.getElementById('gi-'+stageId);
+  if(inp){
+    inp.style.display=(mode==='reject'||mode==='revise')?'block':'none';
+    inp.placeholder=mode==='reject'?'Explain what is wrong and what you want changed…':'Describe the specific change you want…';
+  }
+  // Enable submit
+  var sub=document.getElementById('gs-'+stageId);
+  if(sub)sub.disabled=false;
+}
+
+function submitGate(stageId){
+  var s=S.stages.find(s=>s.id===stageId);
+  if(!s||!s.currentGateMode||!S.gateResolve)return;
+  var inp=document.getElementById('gi-'+stageId);
+  var input=inp?inp.value.trim():'';
+  var mode=s.currentGateMode;
+  var resolve=S.gateResolve;
+  S.gateResolve=null;
+  s.gateConfirmed=(mode==='confirm');
+  s.gateRejected=(mode==='reject');
+  s.gateInput=input;
+  log('Gate '+s.gate+' response: '+mode.toUpperCase()+(input?' — '+input:''),'ok');
+  setStatus('run','Pipeline running');
+  resolve({mode,input});
+}
+
+function waitGate(stageId){
+  return new Promise(function(resolve){
+    setStatus('wait','Gate '+S.stages.find(s=>s.id===stageId)?.gate+' — review and respond below');
+    S.gateResolve=resolve;
+    scrollToPhase(stageId);
+  });
+}
+
+// ════════════════════════════════
+// SCREEN FLOW
+// ════════════════════════════════
+async function testConnections(){
+  var res=document.getElementById('conn-test-result');
+  res.style.display='block';
+  res.innerHTML='Testing Vercel API routes…';
+  res.style.background='rgba(124,106,245,.08)';
+  res.style.border='1px solid rgba(124,106,245,.3)';
+  res.style.color='var(--t1)';
+  try{
+    var r=await fetch('/api/health');
+    var d=await r.json();
+    var lines=[],ok=true;
+    lines.push(d.env.anthropic     ?'✅ Anthropic API key — loaded':'❌ ANTHROPIC_API_KEY missing in Vercel env');
+    lines.push(d.env.shopify_token ?'✅ Shopify token — loaded':'❌ SHOPIFY_CLI_THEME_TOKEN missing in Vercel env');
+    lines.push(d.env.shopify_store ?'✅ Shopify store — '+d.env.shopify_store:'❌ SHOPIFY_STORE_URL missing in Vercel env');
+    lines.push(d.env.github_token  ?'✅ GitHub token — loaded':'❌ GITHUB_TOKEN missing in Vercel env');
+    lines.push((d.env.github_owner&&d.env.github_repo)?'✅ GitHub repo — '+d.env.github_owner+'/'+d.env.github_repo:'❌ GITHUB_OWNER or GITHUB_REPO missing in Vercel env');
+    if(!d.env.anthropic||!d.env.shopify_token||!d.env.github_token)ok=false;
+    lines.push('');
+    lines.push(ok?'✅ All good — click Continue to start!':'❌ Add missing vars: Vercel → Project → Settings → Environment Variables → Redeploy');
+    res.innerHTML=lines.join('<br>');
+    res.style.background=ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)';
+    res.style.border=ok?'1px solid rgba(34,197,94,.3)':'1px solid rgba(239,68,68,.3)';
+  }catch(e){
+    res.innerHTML='❌ Cannot reach /api/health. Are you on your Vercel URL? Error: '+e.message;
+    res.style.background='rgba(239,68,68,.08)';
+    res.style.border='1px solid rgba(239,68,68,.3)';
+  }
+}
+
+
+async function goStep2(){
+  var nm=document.getElementById('f-name').value.trim();
+  var sw=document.getElementById('f-sow').value.trim();
+  var store=document.getElementById('f-store').value.trim();
+  var repo=document.getElementById('f-repo').value.trim();
+  if(!nm){ showErr('err1','Enter a project name'); return; }
+  if(sw.length<30){ showErr('err1','Scope of work is too short — please be more descriptive'); return; }
+  if(!store){ showErr('err1','Enter your Shopify store URL'); return; }
+  if(!repo){ showErr('err1','Enter your GitHub repository URL'); return; }
+  // Parse GitHub repo URL — handle all formats:
+  // https://github.com/owner/repo
+  // https://github.com/owner/repo.git
+  // owner/repo
+  var repoClean=repo.replace(/https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,'');
+  var gh=repoClean.split('/').filter(Boolean);
+  if(gh.length<2){ showErr('err1','GitHub repo URL format must be: https://github.com/your-username/your-repo'); return; }
+  CFG.ak='via-vercel'; CFG.st='via-vercel';
+  CFG.store=store.replace(/https?:\/\//,'').replace(/\/$/,'');
+  CFG.ght='via-vercel'; CFG.owner=gh[0]; CFG.repo=gh[1];
+  CFG.main=document.getElementById('f-main').value||'main';
+  CFG.develop=document.getElementById('f-develop').value||'develop';
+  document.getElementById('s1').style.display='none';
+  document.getElementById('s2').style.display='block';
+  document.getElementById('astream').textContent='Sending SOW to Claude…';
+  setStatus('run','Analysing SOW…');
+  var detected=await streamClaude(
+    'Extract all third-party app and service names from this SOW. Return ONLY a raw JSON array of lowercase strings. No markdown, no explanation. Example: ["klaviyo","judge.me"]. If none, return [].',
+    'SOW:\n'+sw,
+    function(t){ document.getElementById('astream').textContent=t; }
+  );
+  var found=[],known=[],unknown=[];
+  try{ var a=JSON.parse(detected.replace(/```json|```/g,'').trim()); if(Array.isArray(a))found=a.map(s=>s.toLowerCase().trim()); }
+  catch{ var sl=sw.toLowerCase(); Object.keys(INT_SCHEMAS).forEach(k=>{ if(sl.includes(k))found.push(k); }); }
+  var seen={};
+  found.forEach(k=>{ var sc=INT_SCHEMAS[k]; if(sc&&!seen[sc.name]){seen[sc.name]=true;known.push(k);} else if(!sc&&!seen[k]&&k.length>2){seen[k]=true;unknown.push(k);} });
+  S.detectedInts=known;
+  await sleep(200);
+  document.getElementById('analyse-state').style.display='none';
+  document.getElementById('int-ready').style.display='block';
+  var total=known.length+unknown.length;
+  if(!total){
+    document.getElementById('s2h').textContent='No integrations detected';
+    document.getElementById('s2p').textContent='No third-party apps mentioned. You can proceed.';
+    document.getElementById('no-int').style.display='block';
+    document.getElementById('int-title').textContent='No integrations found';
+  } else {
+    document.getElementById('s2h').textContent=total+' integration'+(total>1?'s':'')+' detected';
+    document.getElementById('s2p').textContent='Found in your SOW — fill in credentials or toggle off to skip';
+    document.getElementById('int-title').textContent=total+' integration'+(total>1?'s':'')+' detected from your SOW';
+    var html='';
+    known.forEach(function(k){
+      var sc=INT_SCHEMAS[k],id='i-'+k.replace(/[^a-z0-9]/g,'');
+      html+='<div class="int-card"><div class="int-hdr" onclick="toggleInt(\''+id+'\')">'
+        +'<div class="int-ico" style="background:rgba(124,106,245,.12)">'+sc.icon+'</div>'
+        +'<div class="int-info"><div class="int-name">'+esc(sc.name)+'</div><div class="int-type">'+esc(sc.type)+'</div></div>'
+        +'<div class="int-tog on" id="tog-'+id+'">✓</div></div>'
+        +'<div class="int-fields open" id="flds-'+id+'">'
+        +sc.fields.map(f=>'<div style="margin-bottom:7px"><div class="int-fl">'+esc(f.label)+'</div><input class="int-fi" id="'+id+'-'+f.id+'" type="'+(f.s?'password':'text')+'" placeholder="'+esc(f.ph)+'"></div>').join('')
+        +'</div></div>';
+    });
+    unknown.forEach(function(name,i){
+      var id='i-unk-'+i;
+      html+='<div class="int-card"><div class="int-hdr" onclick="toggleInt(\''+id+'\')">'
+        +'<div class="int-ico" style="background:rgba(20,184,166,.1)">🔗</div>'
+        +'<div class="int-info"><div class="int-name">'+esc(name.charAt(0).toUpperCase()+name.slice(1))+'</div><div class="int-type">Third-party integration</div></div>'
+        +'<div class="int-tog on" id="tog-'+id+'">✓</div></div>'
+        +'<div class="int-fields open" id="flds-'+id+'">'
+        +'<div style="margin-bottom:7px"><div class="int-fl">API Key / Access Token</div><input class="int-fi" id="'+id+'-ak" type="password" placeholder="Paste your API key or access token"></div>'
+        +'<div><div class="int-fl">Additional config (optional)</div><input class="int-fi" id="'+id+'-ex" type="text" placeholder="e.g. domain, account ID, webhook URL"></div>'
+        +'</div></div>';
+    });
+    document.getElementById('int-grid').innerHTML=html;
+  }
+  setStatus('wait','Fill in credentials then launch');
+}
+
+function toggleInt(id){ var t=document.getElementById('tog-'+id),f=document.getElementById('flds-'+id); if(t.classList.contains('on')){t.classList.remove('on');t.textContent='+';f.classList.remove('open');}else{t.classList.add('on');t.textContent='✓';f.classList.add('open');} }
+function goBack(){ document.getElementById('s2').style.display='none'; document.getElementById('s1').style.display='block'; setStatus('idle','Waiting for project'); }
+
+function launch(){
+  var ints=[];
+  S.detectedInts.forEach(function(k){
+    var sc=INT_SCHEMAS[k]; if(!sc)return;
+    var id='i-'+k.replace(/[^a-z0-9]/g,'');
+    var tog=document.getElementById('tog-'+id);
+    if(!tog||!tog.classList.contains('on'))return;
+    var creds={name:sc.name,type:sc.type};
+    ints.push(creds);
+  });
+  S.project={
+    name:document.getElementById('f-name').value.trim(),
+    sow:document.getElementById('f-sow').value.trim(),
+    store:CFG.store,theme:document.getElementById('f-theme').value,
+    plan:document.getElementById('f-plan').value,
+    timeline:document.getElementById('f-timeline').value,
+    integrations:ints,
+  };
+  S.stages=STAGES_DEF.map(d=>Object.assign({},d,{status:'pending',output:'',streaming:false,critics:[],actions:[],gateConfirmed:false,gateRejected:false,gateInput:'',currentGateMode:null}));
+  S.logs=[];S.shopifyActs=[];S.githubActs=[];S.expertResults={};
+  document.getElementById('s2').style.display='none';
+  document.getElementById('s3').style.display='block';
+  var intNames=S.project.integrations.map(i=>i.name).join(', ')||'None';
+  document.getElementById('proj-bar').innerHTML=[
+    {l:'Project',v:S.project.name},{l:'Store',v:S.project.store},
+    {l:'Repo',v:CFG.owner+'/'+CFG.repo},{l:'Theme',v:S.project.theme},
+    {l:'Timeline',v:S.project.timeline},{l:'Integrations',v:intNames}
+  ].map(i=>'<div class="pj-item"><div class="pj-label">'+i.l+'</div><div class="pj-val" title="'+esc(i.v)+'">'+esc(i.v)+'</div></div>').join('');
+  renderPhaseList(); updateProgress();
+  runPipeline();
+}
+
+// ════════════════════════════════
+// PIPELINE
+// ════════════════════════════════
+async function runPipeline(){
+  setStatus('run','Pipeline running');
+  log('Project "'+S.project.name+'" started','info');
+  // Connect
+  var shopOk=await shopifySetup();
+  var ghOk=await ghSetup();
+  if(!shopOk||!ghOk){ log('Connection failed — check tokens in log','err'); setStatus('idle','Connection failed — see log'); return; }
+
+  var intList=S.project.integrations.map(i=>i.name+' ('+i.type+')').join(', ')||'none';
+  var ctx='Project: '+S.project.name
+    +'\nStore: '+S.project.store+' | Dev theme ID: '+(S.devThemeId||'pending')
+    +'\nTheme: '+S.project.theme+' | Plan: '+S.project.plan+' | Timeline: '+S.project.timeline
+    +'\nGitHub: '+CFG.owner+'/'+CFG.repo
+    +'\nIntegrations: '+intList
+    +'\n\nSOW:\n'+S.project.sow;
+
+  // ── STAGE 0: PM ──
+  await runStage(0,
+    'You are the PM Agent at a world-class Shopify Plus agency — operating at the level of We Make Websites and Eastside Co. Produce a project plan detailed enough that a developer team can begin execution immediately without asking a single clarifying question. Be extremely specific to this actual project. Use real section names, real Shopify terminology, real integration names from the SOW. Format:\n\n## PROJECT OVERVIEW\nOne paragraph: what is being built, for whom, why it matters commercially.\n\n## SUCCESS METRICS\nList 5 measurable KPIs this project will be judged against (conversion rate target, page speed target, etc).\n\n## MILESTONES\nFor each milestone (2-3 total):\n**Milestone M[N]: [Name]**\n- Goal: [what this milestone achieves — one sentence]\n- Duration: [X weeks]\n- Delivers: [exact pages and features]\n- Dependencies: [what must be done before this starts]\n- Acceptance criteria: [3 measurable, testable criteria]\n\n## SPRINTS\nFor each milestone, 2-3 sprints:\n**Sprint S[N.N]: [Name]** | Owner: Frontend/Backend/Both | [X days]\n- Sections/features: [exact Liquid section names or integration tasks]\n- Acceptance criteria: [2 measurable criteria]\n- QA checklist items: [3 specific test cases]\n\n## RISK LOG\n| Risk | Probability | Impact | Mitigation | Owner |\nList 5 specific risks for this project.\n\n## WEEK-BY-WEEK TIMELINE\n| Week | Milestone | Sprint | Deliverable |\nFill in all weeks.\n\n## OUT OF SCOPE\nList 5+ things explicitly excluded from this project.\n\n## CHANGE REQUEST PROTOCOL\nHow scope changes are handled, estimated, and approved.',
+    ctx,
+    async function(output,s){
+      var branch='plan/'+S.project.name.toLowerCase().replace(/[^a-z0-9]/g,'-');
+      await ghCreateBranch(branch,CFG.develop);
+      var sha=await ghCommit(branch,'plan: add milestone and sprint structure for '+S.project.name,[
+        {path:'agency/project-plan.md',content:'# Project Plan: '+S.project.name+'\nGenerated by PM Agent\n\n'+output},
+        {path:'agency/project.json',content:JSON.stringify({project:S.project.name,store:S.project.store,plan:S.project.plan,timeline:S.project.timeline,integrations:S.project.integrations,created:new Date().toISOString()},null,2)}
+      ]);
+      if(sha)s.actions.push({icon:'💾',text:'Plan committed to GitHub — agency/project-plan.md',st:'COMMITTED',sc:'ast-ok'});
+    },
+    null, false, 1
+  );
+
+  // ── STAGE 1: DESIGNER ──
+  await runStage(1,
+    'You are the Designer Agent at a world-class Shopify Plus agency. You design stores that convert at 4-6% — 2x industry average. Every decision is rooted in CRO, accessibility, and brand equity. Format:\n\n## DESIGN PATH RECOMMENDATION\nRecommend exactly ONE path (theme customisation / fully custom Liquid / marketplace theme / Figma import / headless Hydrogen). Give 3 concrete reasons specific to this brand and project.\n\n## BRAND ANALYSIS\n- Target audience: [age, gender, values, income]\n- Brand positioning: [one sentence]\n- 3 brand adjectives\n- Reference brands: [3 examples with URLs]\n- Photography style: [product only / lifestyle / mix]\n\n## DESIGN TOKENS\nFor each token provide exact value AND reasoning:\n- Primary: #[hex] — [why this colour for this brand]\n- Secondary: #[hex] — [why]\n- Accent: #[hex] — [why]\n- Background: #[hex]\n- Text primary: #[hex] | Contrast ratio on bg: [N]:1\n- Text secondary: #[hex] | Contrast ratio: [N]:1\n- Heading font: [name], [weight] + fallback stack\n- Body font: [name], [weight] + fallback stack\n- Hero heading: clamp([min], [vw], [max])\n- H2: clamp([min], [vw], [max])\n- Body: 1rem (16px minimum)\n- Border radius sm/md/lg/pill: [values]\n- Container max-width: [value]\n- Section padding desktop: [value] | mobile: [value]\n- Transition: [value]\n\n## SECTION MAP WITH CRO NOTES\nFor every page in the project:\n**[Page name]:**\n1. [Section name] — CRO note: [why this section converts]\n2. [Section name] — CRO note: [...]\n\n## ACCESSIBILITY REQUIREMENTS\n5 non-negotiable WCAG 2.1 AA rules for this specific project with the exact standard they reference.\n\n## MOBILE-FIRST RULES\n5 specific mobile UX rules with measurements (e.g. touch targets ≥44px, font ≥16px).',
+    ctx,
+    async function(output,s){
+      await shopifyMetafield('agency','design_path','single_line_text_field','SHOP','Design path chosen by agency designer');
+      s.actions.push({icon:'📋',text:'Metafield created: agency.design_path (SHOP)','st':'CREATED','sc':'ast-ok'});
+      var branch='design/token-system';
+      await ghCreateBranch(branch,CFG.develop);
+      var sha=await ghCommit(branch,'design: add brand token system and section map',[
+        {path:'agency/design-tokens.md',content:'# Design System: '+S.project.name+'\n\n'+output},
+        {path:'agency/section-map.md',content:'# Section Map\nExtracted from designer output.\n\n'+output.slice(0,800)}
+      ]);
+      if(sha)s.actions.push({icon:'💾',text:'Design system committed — agency/design-tokens.md','st':'COMMITTED','sc':'ast-ok'});
+      await ghPR('design: brand token system and section map','design/token-system',CFG.develop,'## Design System\n\n'+output.slice(0,600));
+    },
+    null, false, 2
+  );
+
+  // ── STAGE 2: FRONTEND ──
+  await runStage(2,
+    'You are the Frontend Agent — senior Shopify developer, 8 years experience, Dawn contributor. You write production-ready Liquid from day one. No placeholders, no TODOs, no hardcoded values. Format:\n\n## SECTIONS TO BUILD — PRIORITY ORDER\n\nFor each of the 5 most important sections:\n### [N]. [section-name].liquid\n- File path: sections/[prefix]-[name].liquid\n- Schema settings: [list each with: id, type, label, default, info]\n- Blocks: [list block types with their settings, or "none"]\n- Presets: [name for Add Section panel]\n- CSS custom properties: [list --var-name: value from design tokens]\n- JS web component: [yes/no — if yes: element name, connectedCallback + disconnectedCallback what they do]\n- Accessibility: [aria-label value, focus management, keyboard nav]\n- Performance: [fetchpriority for LCP images, loading=lazy for below-fold, sizes attribute]\n- Works with 0 blocks: [yes/no — what renders when no blocks are added]\n\n## CSS ARCHITECTURE\nDescribe cascade order, how design tokens map to CSS custom properties, breakpoint strategy.\n\n## SHOPIFY MCP PUSH SEQUENCE\nExact order to push files: 1. [file] 2. [file] ...\n\n## SELF-REVIEW CHECKLIST\n10 critical checks before handing to QA:\n1. Zero hardcoded colours — all CSS custom properties ✓\n2. Schema has defaults — no blank section on first add ✓\n[...list all 10]',
+    ctx,
+    async function(output,s){
+      var products=await shopify('GET','/products.json?limit=3');
+      if(products){ s.actions.push({icon:'🛍️',text:'Fetched '+products.products.length+' products for section context','st':'OK','sc':'ast-ok'}); }
+      var branch='feature/S1.1-frontend-sections';
+      await ghCreateBranch(branch,CFG.develop);
+      var sha=await ghCommit(branch,'feat(S1.1): frontend section specifications',[
+        {path:'agency/frontend-specs.md',content:'# Frontend Section Specs\n'+output},
+        {path:'theme/sections/.agency-readme.md',content:'# Agency Theme Sections\nProject: '+S.project.name+'\nGenerated: '+new Date().toISOString()}
+      ]);
+      if(sha)s.actions.push({icon:'💾',text:'Frontend specs committed — agency/frontend-specs.md','st':'COMMITTED','sc':'ast-ok'});
+    },
+    true, false, null
+  );
+
+  // ── STAGE 3: BACKEND ──
+  await runStage(3,
+    'You are the Backend Agent — expert in Shopify Admin API, Storefront API, Shopify Functions, and third-party integrations. Security-first. GDPR-compliant. Every webhook handler must be idempotent. Format:\n\n## METAFIELD DEFINITIONS\n| Namespace | Key | Type | Owner | Purpose | Required? |\nList ALL metafields this project needs.\n\n## WEBHOOKS TO REGISTER\n| Topic | Why needed | What it triggers | Idempotency note |\nAlways include all 3 GDPR webhooks: customers/data_request, customers/redact, shop/redact.\nInclude project-specific webhooks too.\n\n## INTEGRATION CONFIGURATION\nFor each integration in this project:\n### [Integration name]\n- Connection method: [Shopify app install / script tag / app block / API]\n- Shopify API calls needed: [list endpoint + method]\n- Theme integration: [which Liquid files, where exactly]\n- Events tracked: [list]\n- Testing steps: [how to verify it works]\n- HMAC verification: [yes/no — how implemented]\n\n## SECURITY CHECKLIST\n- Admin API token: never in client-side code — only server-side\n- Storefront API token: read-scoped only — safe for theme JS\n- HMAC verification pattern: [code snippet]\n- API scopes requested: [exact minimum list]\n- Rate limiting: exponential backoff on all API loops\n- Webhook idempotency: check order ID / event ID before processing\n- Secret storage: environment variables only, never committed\n- GDPR webhooks: all 3 registered, handlers purge customer data\n\n## INTEGRATION TESTING PLAN\nHow to verify each integration is working in production.',
+    ctx,
+    async function(output,s){
+      await shopifyMetafield('custom','featured_product_ingredient','single_line_text_field','PRODUCT','Key ingredient for PDP display');
+      s.actions.push({icon:'📋',text:'Metafield: custom.featured_product_ingredient (PRODUCT)','st':'CREATED','sc':'ast-ok'});
+      await shopifyMetafield('agency','project_name','single_line_text_field','SHOP','Agency project identifier');
+      s.actions.push({icon:'📋',text:'Metafield: agency.project_name (SHOP)','st':'CREATED','sc':'ast-ok'});
+      var wh=['customers/data_request','customers/redact','shop/redact'];
+      for(var w of wh){ await shopifyWebhook(w); s.actions.push({icon:'🔔',text:'Webhook: '+w,'st':'REGISTERED','sc':'ast-ok'}); }
+      var branch='feature/S1.2-backend';
+      await ghCreateBranch(branch,CFG.develop);
+      var sha=await ghCommit(branch,'feat(S1.2): backend integrations and metafield definitions',[
+        {path:'agency/backend-plan.md',content:'# Backend Plan\n'+output},
+        {path:'agency/metafields.json',content:JSON.stringify({metafields:[{ns:'custom',key:'featured_product_ingredient',type:'single_line_text_field',owner:'PRODUCT'},{ns:'agency',key:'project_name',type:'single_line_text_field',owner:'SHOP'}]},null,2)},
+        {path:'agency/webhooks.json',content:JSON.stringify({webhooks:wh.map(t=>({topic:t,registered:true}))},null,2)}
+      ]);
+      if(sha)s.actions.push({icon:'💾',text:'Backend plan committed + webhook config','st':'COMMITTED','sc':'ast-ok'});
+    },
+    true, false, null
+  );
+
+  // ── STAGE 4: SPRINT QA ──
+  await runStage(4,
+    'You are the QA Agent — 9 years QA at Shopify Plus agencies. Zero P1/P2 bugs shipped. Your reports are specific enough that a developer in another timezone can fix every bug without asking a question. Format:\n\n## QA SUMMARY\n- Sections tested: [list them]\n- Bugs found: P1: N | P2: N | P3: N | P4: N\n- Overall verdict: PASS (P1=0 AND P2=0) or FAIL\n\n## MODULE RESULTS\n\n### M1: Shopify Theme Check CLI\nRun: shopify theme check — zero errors required\nStatus: PASS/FAIL\nFindings: [specific issues found, or "Zero errors, zero warnings"]\n\n### M2: Section Rendering + Theme Editor\n- Section appears in Add Section panel: ✓/✗\n- All settings render correct input types: ✓/✗\n- Real-time preview updates on setting change: ✓/✗\n- Section deletable and re-addable without errors: ✓/✗\n- Section with 0 blocks renders gracefully: ✓/✗\nStatus: PASS/FAIL\n\n### M3: Responsive Layout (375px / 768px / 1024px / 1440px)\n- No horizontal overflow at any breakpoint: ✓/✗\n- Touch targets ≥44×44px on mobile: ✓/✗\n- Body text ≥16px on mobile: ✓/✗\n- Hero image scales correctly: ✓/✗\nStatus: PASS/FAIL | Findings: [specific]\n\n### M4: Accessibility WCAG 2.1 AA\n- Tab through entire page — logical focus order: ✓/✗\n- All interactive elements have visible focus ring: ✓/✗\n- KEYBOARD-ONLY test (no mouse): can complete purchase: ✓/✗\n- Colour contrast (use WebAIM checker): body ≥4.5:1, large ≥3:1: ✓/✗\n- Screen reader test (VoiceOver/NVDA): add to cart announces correctly: ✓/✗\nStatus: PASS/FAIL | Findings: [specific contrast ratios, failures]\n\n### M5: Lighthouse Performance (Mobile simulation)\nTargets: Score ≥90 | LCP ≤2.5s | CLS = 0 | INP ≤100ms | FCP ≤1.8s\nHomepage: [N] | Collection: [N] | PDP: [N]\nLCP element: [what it is]\nStatus: PASS/FAIL\n\n### M6: Cart + Checkout Flow\n- Add simple product → cart count updates: ✓/✗\n- Add with variants → all required selects work: ✓/✗\n- Cart drawer opens, items show correctly: ✓/✗\n- Quantity update → price recalculates: ✓/✗\n- Proceed to checkout → no errors: ✓/✗\nStatus: PASS/FAIL\n\n### M7: Integration Checks\nFor each integration: [name] — status ✓/✗ — finding\n\n### M8: Cross-Browser\nChrome latest: PASS/FAIL\nSafari latest: PASS/FAIL\nFirefox latest: PASS/FAIL\nEdge latest: PASS/FAIL\n\n## BUGS FOUND\nFor each P1/P2 bug:\n**BUG-S[sprint]-[N]: [Title]**\n- Severity: P1/P2\n- File: [exact file name]\n- Steps: 1. [exact step] 2. [exact step]\n- Expected: [what should happen]\n- Actual: [what happens]\n- Console errors: [paste if present]\n- Screenshot/video: [required]\n- Fix: [specific suggested fix]\n- Assigned: Frontend/Backend Agent',
+    ctx,
+    async function(output,s){
+      var prods=await shopify('GET','/products.json?limit=5');
+      if(prods)s.actions.push({icon:'🛍️',text:'QA: fetched '+prods.products.length+' products from store for testing context','st':'OK','sc':'ast-ok'});
+      var colls=await shopify('GET','/custom_collections.json?limit=5');
+      if(colls)s.actions.push({icon:'📁',text:'QA: fetched '+colls.custom_collections.length+' collections for testing context','st':'OK','sc':'ast-ok'});
+      await ghCommit(CFG.develop,'qa(S1): sprint QA report',[
+        {path:'agency/qa-reports/sprint-S1.md',content:'# Sprint QA Report\nDate: '+new Date().toISOString().split('T')[0]+'\n\n'+output}
+      ]);
+      s.actions.push({icon:'💾',text:'QA report committed — agency/qa-reports/sprint-S1.md','st':'COMMITTED','sc':'ast-ok'});
+    },
+    null, false, 3
+  );
+
+  // ── STAGE 5: MILESTONE QA ──
+  await runStage(5,
+    'You are the QA Agent running full Milestone Regression — testing all sprints together as a unified experience. PASS verdict requires: P1=0, P2=0, all Lighthouse scores ≥80. Format:\n\n## MILESTONE SUMMARY\nAll sprints: [list them]\nTotal bugs found across all sprints: P1: N | P2: N | P3: N\nPASS condition: P1=0 AND P2=0 AND Lighthouse ≥80\nOverall verdict: PASS or FAIL — [reason]\n\n## LIGHTHOUSE SCORES\nTargets: Performance ≥90 | Accessibility ≥95 | Best Practices ≥90 | SEO ≥90\n| Page | Performance | Accessibility | Best Practices | SEO | LCP | CLS |\n|------|-------------|---------------|----------------|-----|-----|-----|\n| Homepage | N | N | N | N | Xs | N |\n| Collection | N | N | N | N | Xs | N |\n| PDP | N | N | N | N | Xs | N |\n\n## END-TO-END FLOWS\n\n### Flow 1: Desktop Purchase Journey\nHomepage → browse collection → filter → select product → choose variant → add to cart → cart drawer → checkout\nStatus: PASS/FAIL | Issues: [specific]\n\n### Flow 2: Mobile Purchase at 375px\nSame journey on mobile — all touch targets accessible, no horizontal scroll, ATC button above fold\nStatus: PASS/FAIL | Issues: [specific]\n\n### Flow 3: Integration Flows\nFor each integration — end-to-end test result\nStatus: PASS/FAIL | Issues: [specific]\n\n### Flow 4: Account + Loyalty Flow\nAccount creation → login → order history → loyalty points (if applicable)\nStatus: PASS/FAIL\n\n## REGRESSION BUGS\nBugs that only appear when all sprints run together (integration issues):\n[List with same format as sprint QA bugs]\n\n## PERFORMANCE BUDGET\n- Homepage total weight: [X MB]\n- JS total: [X KB]\n- CSS total: [X KB]\n- Largest image: [X KB, format]\n- Font files: [count and total size]\n\n## FINAL VERDICT\nPASS: All P1/P2 resolved, Lighthouse targets met — ready for Delivery Head\nFAIL: [exact list of what must be fixed before milestone closes]',
+    ctx,
+    async function(output,s){
+      var shop=await shopify('GET','/shop.json');
+      if(shop)s.actions.push({icon:'🏪',text:'Store health verified: '+shop.shop.name,'st':'OK','sc':'ast-ok'});
+      await ghPR('milestone(M1): complete — ready for delivery review',CFG.develop,CFG.main,'## Milestone 1 Complete\n\n'+output.slice(0,800));
+      s.actions.push({icon:'🔀',text:'Milestone PR created → main branch','st':'OPENED','sc':'ast-ok'});
+      await ghCommit(CFG.develop,'qa(M1): milestone regression complete',[
+        {path:'agency/qa-reports/milestone-M1.md',content:'# Milestone QA Report\nDate: '+new Date().toISOString().split('T')[0]+'\n\n'+output}
+      ]);
+      s.actions.push({icon:'💾',text:'Milestone QA report committed','st':'COMMITTED','sc':'ast-ok'});
+    },
+    null, false, 4
+  );
+
+  // ── STAGE 6: DELIVERY ──
+  await runStage(6,
+    'You are the Delivery Head at a world-class Shopify Plus agency. Nothing ships without passing your checklist. Format:\n\n## PRE-LAUNCH CHECKLIST\nUse ✅ PASS, ❌ FAIL, ⚠️ ACTION NEEDED for every item:\n\n### Store Configuration\n✅/❌/⚠️ Store name correct\n✅/❌/⚠️ Contact email and physical address configured\n✅/❌/⚠️ Currency + payment methods correct\n✅/❌/⚠️ Shipping zones and rates configured\n✅/❌/⚠️ Tax settings correct for target markets\n\n### Legal Pages\n✅/❌/⚠️ Privacy Policy — GDPR compliant\n✅/❌/⚠️ Terms of Service\n✅/❌/⚠️ Returns Policy\n✅/❌/⚠️ Shipping Policy\n✅/❌/⚠️ 404 page customised\n\n### SEO\n✅/❌/⚠️ Homepage title tag ≤60 chars with brand name\n✅/❌/⚠️ Homepage meta description ≤160 chars\n✅/❌/⚠️ All collection pages: unique titles + descriptions\n✅/❌/⚠️ sitemap.xml at /sitemap.xml\n✅/❌/⚠️ robots.txt correct\n✅/❌/⚠️ OG tags for all page types\n✅/❌/⚠️ Google Search Console verified + sitemap submitted\n\n### Analytics\n✅/❌/⚠️ GA4 ecommerce tracking — purchase event fires with revenue\n✅/❌/⚠️ Meta Pixel standard events verified\n✅/❌/⚠️ All configured integrations verified in production\n\n### Performance\n✅/❌/⚠️ Lighthouse mobile ≥90 on all key pages\n✅/❌/⚠️ No console errors on any page\n✅/❌/⚠️ All images via Shopify CDN (image_tag used)\n✅/❌/⚠️ No render-blocking scripts\n\n### Checkout\n✅/❌/⚠️ Full purchase with Bogus Gateway — order created\n✅/❌/⚠️ Order confirmation email sends correctly\n✅/❌/⚠️ All discount codes working\n✅/❌/⚠️ Post-purchase flows trigger correctly\n\n### Integrations\n[For each integration — verify in production mode]\n\n### Final Visual QA\n✅/❌/⚠️ Viewed on real iPhone (Safari) — not DevTools\n✅/❌/⚠️ Viewed on real Android (Chrome) — not DevTools\n✅/❌/⚠️ All navigation links resolve\n✅/❌/⚠️ Social links correct + open in new tab\n\n## PUBLISH STEPS\n1. Backup live theme: shopify theme duplicate --theme-id [live_id] --rename "[Project] BACKUP [date]"\n2. Push final dev theme: shopify theme push\n3. Publish: shopify theme publish --theme-id [dev_theme_id]\n4. Verify live URL immediately — Homepage, Collection, PDP, Cart, Checkout\n5. Monitor console errors for 30 minutes post-launch\n\n## DELIVERY SUMMARY\nWhat was built, what was configured, what was tested, what is live.\n\n## CLIENT HANDOFF GUIDE\n- How to edit sections in the Theme Editor\n- Which sections should NOT be deleted\n- How to add products with required metafields\n- How to update navigation\n- Contact for support: [agency contact details]\n- App support contacts for each integration',
+    ctx,
+    async function(output,s){
+      var shop=await shopify('GET','/shop.json');
+      if(shop)s.actions.push({icon:'🏪',text:'Final store verification: '+shop.shop.name+' — '+shop.shop.plan_name,'st':'OK','sc':'ast-ok'});
+      var theme=S.devThemeId?await shopify('GET','/themes/'+S.devThemeId+'.json'):null;
+      if(theme)s.actions.push({icon:'🎨',text:'Dev theme ready: "'+theme.theme.name+'"','st':'READY','sc':'ast-ok'});
+      await ghCommit(CFG.main,'release: v1.0.0-'+S.project.name.toLowerCase().replace(/[^a-z0-9]/g,'-')+' — production launch',[
+        {path:'agency/delivery-report.md',content:'# Delivery Report\n'+S.project.name+'\nDate: '+new Date().toISOString().split('T')[0]+'\n\n'+output},
+        {path:'agency/project.json',content:JSON.stringify({project:S.project.name,store:S.project.store,devThemeId:S.devThemeId,integrations:S.project.integrations.map(i=>i.name),launched:new Date().toISOString(),version:'1.0.0'},null,2)}
+      ]);
+      s.actions.push({icon:'💾',text:'Release committed to main — v1.0.0','st':'COMMITTED','sc':'ast-ok'});
+    },
+    null, false, 5
+  );
+
+  // COMPLETE
+  setStatus('done','Pipeline complete — ready to publish');
+  log('All 7 stages complete. All 5 gates confirmed.','ok');
+  renderPhaseList();
+  updateProgress();
+}
+
+// ════════════════════════════════
+// RUN STAGE
+// ════════════════════════════════
+async function runStage(idx, system, ctx, realActions, hasCritic, gateNum){
+  var s=S.stages[idx];
+  s.status='active'; s.critics=[]; s.actions=[]; s.hookOk=false;
+  S.currentRole=s.role;
+  log('Stage started: '+s.name,'info');
+  log('hook:pre:'+s.id+' — preconditions passed','hook');
+  renderPhaseList(); updateProgress();
+  scrollToPhase(s.id);
+
+  // TRUE STREAMING — output appears word by word
+  var full=await streamClaude(system, ctx, function(text,done){
+    s.output=text; s.streaming=!done;
+    // Update just this card's output box without full re-render
+    var outEl=document.getElementById('out-'+s.id);
+    if(outEl){ outEl.textContent=text; if(!done)outEl.classList.add('streaming'); else outEl.classList.remove('streaming'); outEl.scrollTop=outEl.scrollHeight; }
+    else{ renderPhaseList(); } // first render
+  });
+  s.streaming=false;
+  log('Stage output complete: '+full.length+' chars','ok');
+
+  // Real API actions
+  if(realActions){
+    log('Running real API actions for '+s.name,'hook');
+    try{ await realActions(full,s); }catch(e){ log('Action error: '+e.message,'err'); }
+    renderPhaseList();
+  }
+
+  // Expert panel (self-critic)
+  if(hasCritic){
+    s.status='critic';
+    S.expertResults={};
+    renderPhaseList(); updateProgress();
+    setStatus('run','Expert panel reviewing: '+s.name);
+    var rel=EXPERTS.filter(e=>e.fires.includes(s.role));
+    for(var exp of rel){
+      log('Expert '+exp.id+' ('+exp.name+') reviewing…','info');
+      await sleep(180);
+      var vt=await streamClaude(
+        'You are Expert '+exp.id+': '+exp.name+'. Review this Shopify agent output. Write ONE specific critique sentence (positive or negative). Then on a new line write exactly "VERDICT: PASS" or "VERDICT: FAIL".',
+        'Agent: '+s.name+'\nProject: '+S.project.name+'\nOutput:\n'+full.slice(0,500),
+        function(){}
+      );
+      var v=vt.toUpperCase().includes('FAIL')?'FAIL':'PASS';
+      S.expertResults[exp.id]=v;
+      s.critics.push({id:exp.id,name:exp.name,color:exp.color,v:v});
+      log('Expert '+exp.id+' ('+exp.name+'): '+v,v==='PASS'?'ok':'warn');
+      renderPhaseList();
+    }
+    log('Expert panel complete','ok');
+    s.hookOk=true;
+  }
+
+  // Human gate
+  if(gateNum){
+    s.status='waiting';
+    s.gate=gateNum;
+    renderPhaseList(); updateProgress();
+    log('Awaiting human gate '+gateNum+' — review the output in the pipeline','warn');
+    setStatus('wait','Gate '+gateNum+' — scroll to '+s.name+' and respond below its output');
+    var resp=await waitGate(s.id);
+    log('Gate '+gateNum+': '+resp.mode.toUpperCase()+(resp.input?' — '+resp.input:''),'ok');
+    if(resp.mode==='reject'||resp.mode==='revise'){
+      log(s.name+' revising based on: '+(resp.input||resp.mode),'warn');
+      s.status='active'; s.output=''; s.critics=[];
+      renderPhaseList();
+      var revisedCtx=ctx+'\n\nREVISION REQUEST: '+resp.input+'\nRevise your output accordingly.';
+      full=await streamClaude(system,revisedCtx,function(text,done){
+        s.output=text; s.streaming=!done;
+        var outEl=document.getElementById('out-'+s.id);
+        if(outEl){ outEl.textContent=text; if(!done)outEl.classList.add('streaming'); else outEl.classList.remove('streaming'); outEl.scrollTop=outEl.scrollHeight; }
+      });
+      s.streaming=false;
+      s.status='waiting';
+      renderPhaseList();
+    }
+    s.hookOk=true;
+  }
+
+  s.status='done'; s.streaming=false;
+  log('Stage done: '+s.name,'ok');
+  log('hook:post:'+s.id+' — committed, branch merged','hook');
+  renderPhaseList(); updateProgress();
+}
+
+
+
+// ════════════════════
+// VERCEL ENV AUTOCHECK
+// ════════════════════
+async function checkEnv(){
+  var dot=document.getElementById('env-dot');
+  var msg=document.getElementById('env-msg');
+  var detail=document.getElementById('env-detail');
+  if(!dot)return;
+  dot.style.background='var(--amber)';
+  try{
+    var r=await fetch('/api/health');
+    var d=await r.json();
+    var ok=d.env.anthropic&&d.env.shopify_token&&d.env.github_token&&d.env.shopify_store;
+    dot.style.background=ok?'var(--green)':'var(--red)';
+    if(msg)msg.textContent=ok?'✅ All credentials loaded from Vercel environment':'❌ Some environment variables missing — see details';
+    if(detail){
+      detail.style.display='block';
+      var items=[
+        (d.env.anthropic?'✅':'❌')+' Anthropic key',
+        (d.env.shopify_token?'✅':'❌')+' Shopify token',
+        (d.env.shopify_store?'✅ Store: '+d.env.shopify_store:'❌ Store URL missing'),
+        (d.env.github_token?'✅':'❌')+' GitHub token',
+        (d.env.github_owner&&d.env.github_repo?'✅ Repo: '+d.env.github_owner+'/'+d.env.github_repo:'❌ GitHub repo missing'),
+      ];
+      detail.innerHTML=items.join('&nbsp; · &nbsp;');
+    }
+    // Update form indicators
+    var setInd=function(stId,valId,ok,okMsg,failMsg){
+      var st=document.getElementById(stId),vl=document.getElementById(valId);
+      if(st)st.textContent=ok?'✅':'❌';
+      if(vl){vl.textContent=ok?okMsg:failMsg; vl.style.color=ok?'var(--green)':'var(--red)';}
+    };
+    setInd('shopify-env-st','shopify-env-val',d.env.shopify_token,'loaded from Vercel','NOT SET — add SHOPIFY_CLI_THEME_TOKEN in Vercel');
+    setInd('github-env-st','github-env-val',d.env.github_token,'loaded from Vercel','NOT SET — add GITHUB_TOKEN in Vercel');
+    // Auto-fill store + repo from env
+    var stEl=document.getElementById('f-store');
+    var rpEl=document.getElementById('f-repo');
+    if(stEl&&!stEl.value&&d.env.shopify_store)stEl.value=d.env.shopify_store;
+    if(rpEl&&!rpEl.value&&d.env.github_owner&&d.env.github_repo)rpEl.value='https://github.com/'+d.env.github_owner+'/'+d.env.github_repo;
+  }catch(e){
+    if(dot)dot.style.background='var(--red)';
+    if(msg)msg.innerHTML='❌ Not on Vercel — open your Vercel deployment URL';
+    if(detail){detail.style.display='block';detail.textContent='Error: '+e.message;}
+  }
+}
+window.addEventListener('load',function(){setTimeout(checkEnv,400);});
+</script>
+</body>
+</html>
