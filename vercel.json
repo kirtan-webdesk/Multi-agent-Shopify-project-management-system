@@ -1,7 +1,10 @@
 {
   "version": 2,
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.js" },
-    { "src": "/(.*)",     "dest": "/public/index.html" }
+    { "src": "/api/github(/.*)?",  "dest": "/api/github.js" },
+    { "src": "/api/shopify(/.*)?", "dest": "/api/shopify.js" },
+    { "src": "/api/claude",        "dest": "/api/claude.js" },
+    { "src": "/api/health",        "dest": "/api/health.js" },
+    { "src": "/(.*)",              "dest": "/public/index.html" }
   ]
 }
