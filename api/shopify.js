@@ -6,14 +6,21 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
-  const token = process.env.SHOPIFY_CLI_THEME_TOKEN;
+  // Accept several common env var names so the user can pick whichever they prefer.
+  const token =
+    process.env.SHOPIFY_ADMIN_API_TOKEN ||
+    process.env.SHOPIFY_ADMIN_TOKEN ||
+    process.env.SHOPIFY_ACCESS_TOKEN ||
+    process.env.SHOPIFY_CLI_THEME_TOKEN;
   const store = process.env.SHOPIFY_STORE_URL;
+
   if (!token || !store) {
-    res.status(500).json({ error: 'SHOPIFY_CLI_THEME_TOKEN or SHOPIFY_STORE_URL not set in Vercel env vars' });
+    res.status(500).json({
+      error: 'Shopify credentials not set. Add SHOPIFY_ADMIN_API_TOKEN (preferred) or SHOPIFY_CLI_THEME_TOKEN, plus SHOPIFY_STORE_URL, in Vercel env vars.'
+    });
     return;
   }
 
-  // Strip /api/shopify from path → /shop.json, /themes.json etc
   const shopifyPath = req.url.replace(/^\/api\/shopify/, '') || '/shop.json';
   const cleanStore  = store.replace(/https?:\/\//, '').replace(/\/$/, '');
   const fullPath    = `/admin/api/2024-01${shopifyPath}`;
@@ -40,6 +47,19 @@ module.exports = async function handler(req, res) {
     upRes.on('data', chunk => data += chunk);
     upRes.on('end', () => {
       res.setHeader('Content-Type', 'application/json');
+
+      // On 401, augment the error body with actionable guidance.
+      if (upRes.statusCode === 401) {
+        let parsed = {};
+        try { parsed = JSON.parse(data); } catch {}
+        res.status(401).json({
+          errors: parsed.errors || 'Invalid API key or access token',
+          hint: 'The token must be a Shopify Admin API access token (starts with "shpat_") from a Custom App in your Shopify admin. Theme Access tokens (used by Shopify CLI for `theme push`) will NOT work here — they cannot access /shop.json, /themes.json, products, or webhooks. Create a custom app under Settings → Apps and sales channels → Develop apps → Create an app, configure Admin API scopes (read_themes, write_themes, read_products, write_products, write_metafields, write_webhooks), install it, and copy the Admin API access token.',
+          store: cleanStore,
+        });
+        return;
+      }
+
       res.status(upRes.statusCode).send(data);
     });
   });

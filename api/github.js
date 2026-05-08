@@ -12,7 +12,6 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  // Strip /api/github → /repos/owner/repo etc
   const githubPath = req.url.replace(/^\/api\/github/, '') || '/';
 
   let bodyData = '';
@@ -40,6 +39,23 @@ module.exports = async function handler(req, res) {
     upRes.on('data', chunk => data += chunk);
     upRes.on('end', () => {
       res.setHeader('Content-Type', 'application/json');
+
+      // Augment 401 / 404 with actionable guidance — GitHub's default message is too terse.
+      if (upRes.statusCode === 401 || upRes.statusCode === 404) {
+        let parsed = {};
+        try { parsed = JSON.parse(data); } catch {}
+        const isAuth = upRes.statusCode === 401;
+        res.status(upRes.statusCode).json({
+          message: parsed.message || (isAuth ? 'Bad credentials' : 'Not Found'),
+          status: upRes.statusCode,
+          path: githubPath,
+          hint: isAuth
+            ? 'GITHUB_TOKEN is invalid or expired. Generate a new Personal Access Token at github.com → Settings → Developer settings → Personal access tokens.'
+            : 'GitHub returned 404. The token authenticated, but it cannot see this resource. Common causes: (1) The repo is private and your token lacks the "repo" scope (Classic PAT) — regenerate with full "repo" checked. (2) You are using a Fine-grained PAT that was not granted access to this specific repo — go to Settings → Developer settings → Fine-grained tokens → edit → add this repo to "Repository access". (3) The repo path is wrong — verify github.com' + githubPath.split('/').slice(0, 3).join('/') + ' opens in your browser.',
+        });
+        return;
+      }
+
       res.status(upRes.statusCode).send(data);
     });
   });
